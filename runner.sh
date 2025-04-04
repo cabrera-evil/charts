@@ -6,7 +6,7 @@ set -euo pipefail
 # Config
 # -------------------------
 DEFAULT_NAMESPACE="production"
-DEFAULT_RELEASE_NAME="portfolio-api"
+DEFAULT_RELEASE_NAME="template-api"
 DEFAULT_HELM_DIR="."
 DEFAULT_VALUES_FILE="values.yaml"
 
@@ -35,7 +35,7 @@ Options:
 Examples:
   $0 install -n production
   $0 upgrade --values custom-values.yaml
-  $0 logs -r my-app
+  $0 logs -r helm-deploy
 EOF
 }
 
