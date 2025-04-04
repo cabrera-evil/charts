@@ -10,7 +10,6 @@ secrets.yaml
 .env.*
 
 # Helm build artifacts
-*.tgz
 chart.lock
 
 # Helm cache
