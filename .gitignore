@@ -1,0 +1,38 @@
+# Ignore all values files
+values.*.yaml
+
+# Except the base values.yaml
+!values.yaml
+
+# Optionally ignore secrets or personal config
+secrets.yaml
+.env
+.env.*
+
+# Helm build artifacts
+*.tgz
+chart.lock
+
+# Helm cache
+~/.helm
+
+# Helm test pods
+*.log
+
+# History (rarely needed)
+.history/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Editor/IDE folders
+.vscode/
+.idea/
+*.code-workspace
+
+# Temp files
+*.swp
+*.swo
+*.tmp
+*.bak
