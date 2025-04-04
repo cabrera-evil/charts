@@ -6,7 +6,7 @@ set -euo pipefail
 # Config
 # -------------------------
 DEFAULT_NAMESPACE="production"
-DEFAULT_RELEASE_NAME="helm-deploy"
+DEFAULT_RELEASE_NAME="deploy-chart"
 DEFAULT_HELM_DIR="."
 DEFAULT_VALUES_FILE="values.yaml"
 
@@ -36,7 +36,7 @@ Options:
 Examples:
   $0 install --stage dev
   $0 upgrade --values values.production.yaml
-  $0 logs -r helm-deploy
+  $0 logs -r deploy-chart
 EOF
 }
 
