@@ -6,7 +6,7 @@ set -euo pipefail
 # Config
 # -------------------------
 DEFAULT_NAMESPACE="production"
-DEFAULT_RELEASE_NAME="template-api"
+DEFAULT_RELEASE_NAME="helm-deploy"
 DEFAULT_HELM_DIR="."
 DEFAULT_VALUES_FILE="values.yaml"
 
@@ -31,10 +31,11 @@ Options:
   -r, --release      Helm release name (default: $DEFAULT_RELEASE_NAME)
   -d, --dir          Helm chart directory (default: $DEFAULT_HELM_DIR)
   -f, --values       Custom values file (default: $DEFAULT_VALUES_FILE)
+  -s, --stage        Deployment stage (uses values.<stage>.yaml)
 
 Examples:
-  $0 install -n production
-  $0 upgrade --values custom-values.yaml
+  $0 install --stage dev
+  $0 upgrade --values values.production.yaml
   $0 logs -r helm-deploy
 EOF
 }
@@ -58,6 +59,10 @@ function parse_args() {
             VALUES_FILE="$2"
             shift
             ;;
+        -s | --stage)
+            STAGE="$2"
+            shift
+            ;;
         install | upgrade | uninstall | logs | describe | status | help)
             COMMAND="$1"
             ;;
@@ -74,7 +79,12 @@ function parse_args() {
     RELEASE_NAME="${RELEASE_NAME:-$DEFAULT_RELEASE_NAME}"
     NAMESPACE="${NAMESPACE:-$DEFAULT_NAMESPACE}"
     HELM_DIR="${HELM_DIR:-$DEFAULT_HELM_DIR}"
-    VALUES_FILE="${VALUES_FILE:-$DEFAULT_VALUES_FILE}"
+
+    if [[ -n "${STAGE:-}" ]]; then
+        VALUES_FILE="values.${STAGE}.yaml"
+    else
+        VALUES_FILE="${VALUES_FILE:-$DEFAULT_VALUES_FILE}"
+    fi
 }
 
 # -------------------------

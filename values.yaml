@@ -5,14 +5,14 @@
 replicaCount: 1
 
 image:
-  repository: cabreraevil/template-api
+  repository: cabreraevil/helm-deploy
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: "template-api"
+fullnameOverride: "helm-deploy"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -77,7 +77,7 @@ ingress:
   tls:
     - hosts:
         - api.cabrera-dev.com
-      secretName: template-api-cert
+      secretName: helm-deploy-cert
 
 resources:
   {}
