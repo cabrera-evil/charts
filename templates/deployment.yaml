@@ -40,6 +40,19 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          envFrom:
+            {{- if .Values.secret.enabled }}
+            - secretRef:
+                name: {{ include "my-app.fullname" . }}-secret
+            {{- end }}
+            {{- if .Values.configMap.enabled }}
+            - configMapRef:
+                name: {{ include "my-app.fullname" . }}-config
+            {{- end }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:

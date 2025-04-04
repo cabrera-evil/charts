@@ -25,6 +25,24 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+env: []
+
+secret:
+  enabled: true
+  nameOverride: ""
+  data:
+    # The secret data to be stored in the secret
+    # key1: value1
+    # key2: value2
+
+configMap:
+  enabled: false
+  nameOverride: ""
+  data:
+    # The config map data to be stored in the config map
+    # key1: value1
+    # key2: value2
+
 podAnnotations: {}
 podLabels: {}
 
@@ -76,11 +94,11 @@ resources:
 
 livenessProbe:
   httpGet:
-    path: /
+    path: /api/health
     port: http
 readinessProbe:
   httpGet:
-    path: /
+    path: /api/health
     port: http
 
 autoscaling:
