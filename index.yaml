@@ -3,12 +3,12 @@ entries:
   deploy-chart:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2025-04-04T00:42:32.721792745-06:00"
-    description: A Helm chart for deploying a sample application.
-    digest: 1e921161e4071f265f9c2a0bf458bf92be128cc3f40dec7f94c99be1e0b7a494
+    created: "2025-04-04T00:50:18.420158414-06:00"
+    description: Generic Helm chart for app deployment
+    digest: 4410c901892008cbf14a5395b51e1bfdb88349cde3bbde02c3efc097287a87f3
     name: deploy-chart
     type: application
     urls:
     - charts/deploy-chart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-04T00:42:32.721224004-06:00"
+generated: "2025-04-04T00:50:18.419598839-06:00"
