@@ -59,4 +59,4 @@ helm install <release-name> cabrera-evil/<chart-name> [flags]
 
 # License
 
-This project is released under the [MIT License](https://github.com/cabrera-evil/charts/blob/main/LICENSE).
+This project is released under the [MIT License](https://github.com/cabrera-evil/charts/blob/master/LICENSE).
