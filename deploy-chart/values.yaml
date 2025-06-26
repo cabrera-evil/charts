@@ -5,14 +5,14 @@
 replicaCount: 1
 
 image:
-  repository: nginx
+  repository: cabreraevil/auto-destructive-api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: "nginx"
+fullnameOverride: "auto-destructive-api"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -31,9 +31,9 @@ secret:
   enabled: true
   nameOverride: ""
   data:
-    # The secret data to be stored in the secret
-    # key1: value1
-    # key2: value2
+    NODE_ENV: cHJvZHVjdGlvbg==
+    BASE_URL: aHR0cDovL2xvY2FsaG9zdDo1MDAw
+    PORT: ODA=
 
 configMap:
   enabled: false
@@ -60,11 +60,11 @@ securityContext:
   allowPrivilegeEscalation: false
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 80
 
 ingress:
-  enabled: true
+  enabled: false
   className: "nginx"
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /

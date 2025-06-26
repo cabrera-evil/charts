@@ -1,69 +1,77 @@
-# deploy-chart
+<!--
 
-This Helm chart is a generic template for deploying applications in a Kubernetes cluster. It includes templates for core Kubernetes resources such as deployments, services, ingress, secrets, and more. The chart is designed to be customizable for different applications.
+********************************************************************************
 
-## 📦 Table of Contents
+WARNING:
 
-- [deploy-chart](#deploy-chart)
-  - [📦 Table of Contents](#-table-of-contents)
-  - [📦 Overview](#-overview)
-  - [🚀 Quick Start](#-quick-start)
-  - [🛠️ Configuration](#️-configuration)
-    - [Example configuration values](#example-configuration-values)
-    - [Additional Customization](#additional-customization)
-    - [Overrides](#overrides)
-  - [🧪 Testing](#-testing)
-  - [⚙️ `runner.sh` Script](#️-runnersh-script)
-    - [Available commands in `runner.sh`](#available-commands-in-runnersh)
-    - [Example usage](#example-usage)
-  - [📄 License](#-license)
+    DO NOT EDIT "deploy-chart/README.md"
 
-## 📦 Overview
+    IT IS PARTIALLY AUTO-GENERATED
 
-The `deploy-chart` includes the following features:
+    (based on Helm templates, values, and CLI tooling)
 
-- Kubernetes **Deployments** for scalable application pods
-- **Service** and **Ingress** resources for external and internal access
-- **ConfigMap** and **Secrets** for configuration and sensitive data management
-- **Horizontal Pod Autoscaling (HPA)** for automatic scaling based on resource usage
-- **Resource management** (CPU and Memory limits/requests)
-- **Probes** (Liveness/Readiness) to ensure application health
-- **ServiceAccount** support for RBAC
+********************************************************************************
 
-## 🚀 Quick Start
+-->
 
-To deploy this Helm chart, follow these steps:
+# Quick reference
 
-1. **Add the Helm repository**:
+- **Maintained by**:  
+  [Douglas Cabrera](https://cabrera-dev.com)
 
-    ```bash
-    helm repo add cabrera-evil https://cabrera-evil.github.io/charts/
-    helm repo update
-    ```
+- **Where to get help**:  
+  [GitHub Issues](https://github.com/cabrera-evil/charts/issues)
 
-2. **Install the chart**:
+# What is this chart?
 
-    ```bash
-    helm install <release-name> cabrera-evil/deploy-chart
-    ```
+**deploy-chart** is a generic and flexible Helm chart for deploying containerized applications into Kubernetes clusters. It includes modular templates for key Kubernetes objects such as Deployments, Services, Ingress, ConfigMaps, Secrets, Autoscaling, and more. The chart is designed to serve as a reusable base for production-ready workloads.
 
-3. **Upgrade the chart** (if needed):
+# How to use this chart
 
-    ```bash
-    helm upgrade <release-name> cabrera-evil/deploy-chart
-    ```
+## Add the Helm repository
 
-4. **Uninstall the chart**:
+```bash
+helm repo add cabrera-evil https://cabrera-evil.github.io/charts/
+helm repo update
+```
 
-    ```bash
-    helm uninstall <release-name>
-    ```
+## Install the chart
 
-## 🛠️ Configuration
+```bash
+helm install <release-name> cabrera-evil/deploy-chart
+```
 
-The `values.yaml` file provides default configuration values for the chart, which you can override when installing or upgrading.
+## Upgrade the chart
 
-### Example configuration values
+```bash
+helm upgrade <release-name> cabrera-evil/deploy-chart
+```
+
+## Uninstall the chart
+
+```bash
+helm uninstall <release-name>
+```
+
+> Use `--values custom.yaml` or `--set key=value` to override default configuration.
+
+# Chart features
+
+- Deployments with configurable replica count
+- Service (ClusterIP/NodePort/LoadBalancer) exposure
+- Ingress support with custom hosts and paths
+- ConfigMaps and Secrets for environment-specific configuration
+- Horizontal Pod Autoscaler (HPA)
+- Resource requests and limits (CPU, memory)
+- Liveness and readiness probes
+- Custom annotations and labels
+- RBAC / ServiceAccount support
+
+# Configuration
+
+Values are defined in `values.yaml` and can be overridden using `--set` or a custom values file.
+
+## Example values
 
 ```yaml
 replicaCount: 1
@@ -79,60 +87,28 @@ service:
 ingress:
   enabled: true
   hosts:
-    - host: chart-example.local
+    - host: example.local
       paths:
         - path: /
           pathType: Prefix
 ```
 
-### Additional Customization
+## Secrets and ConfigMaps
 
-- **Secrets and ConfigMaps**: You can define sensitive data and application configuration using the `secret` and `configMap` settings.
-- **Resource Limits**: Define CPU and memory resource requests/limits for your pods.
+Sensitive data and app configuration can be managed using:
 
-### Overrides
+```yaml
+configMap:
+  enabled: true
+  data:
+    APP_ENV: production
 
-To override default values, create a custom `values.yaml` or specify them directly via `helm install` or `helm upgrade`:
-
-```bash
-helm install <release-name> cabrera-evil/deploy-chart -f custom-values.yaml
+secret:
+  enabled: true
+  data:
+    DATABASE_PASSWORD: s3cr3t
 ```
 
-## 🧪 Testing
+# License
 
-This chart includes a test file under `templates/tests/test-connection.yaml`, which is used to validate the connection to the deployed application.
-
-To test the deployment:
-
-```bash
-kubectl apply -f templates/tests/test-connection.yaml
-```
-
-## ⚙️ `runner.sh` Script
-
-The `runner.sh` script helps automate Helm chart commands such as installation, upgrade, and status checks. You can use it to simplify interactions with your Kubernetes cluster.
-
-### Available commands in `runner.sh`
-
-- `install`: Install the Helm chart with the specified options.
-- `upgrade`: Upgrade an existing release of the chart.
-- `uninstall`: Uninstall the Helm release.
-- `logs`: Tail logs from the deployed pod.
-- `describe`: Describe the main pod in the release.
-- `status`: Check the status of the Helm release.
-
-### Example usage
-
-```bash
-./runner.sh install --stage dev
-./runner.sh upgrade --values values.production.yaml
-./runner.sh logs -r deploy-chart
-```
-
-## 📄 License
-
-This Helm chart is licensed under the [MIT License](LICENSE).
-
----
-
-© 2025 Douglas Cabrera · [cabrera-dev.com](https://cabrera-dev.com)
+This chart is released under the [MIT License](./LICENSE).

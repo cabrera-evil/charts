@@ -1,80 +1,62 @@
-# Cabrera Evil Helm Charts
+<!--
 
-This repository contains a curated collection of Helm charts maintained by [Douglas Cabrera](https://cabrera-dev.com), designed for scalable, secure, and production-grade Kubernetes deployments.
+********************************************************************************
 
-## 📦 Table of Contents
+WARNING:
 
-- [Cabrera Evil Helm Charts](#cabrera-evil-helm-charts)
-  - [📦 Table of Contents](#-table-of-contents)
-  - [🚀 Getting Started](#-getting-started)
-  - [📦 Available Charts](#-available-charts)
-  - [🛠️ Local Development](#️-local-development)
-  - [🌍 GitHub Pages Integration](#-github-pages-integration)
-  - [📄 License](#-license)
+    DO NOT EDIT "charts/README.md"
 
-## 🚀 Getting Started
+    IT IS PARTIALLY AUTO-GENERATED
 
-1. **Add the repository to your Helm client**
+    (based on chart directories, Chart.yaml files, and Helm metadata)
 
-    ```bash
-    helm repo add cabrera-evil https://cabrera-evil.github.io/charts/
-    ```
+********************************************************************************
 
-2. **Update the Helm repository cache**
+-->
 
-    ```bash
-    helm repo update
-    ```
+# Quick reference
 
-3. **Install a chart**
+- **Maintained by**:  
+  [Douglas Cabrera](https://cabrera-dev.com)
 
-    ```bash
-    helm install <release-name> cabrera-evil/<chart-name> [flags]
-    ```
+- **Where to get help**:  
+  [GitHub Issues](https://github.com/cabrera-evil/charts/issues)
 
-## 📦 Available Charts
+# What is this repository?
+
+**Cabrera Evil Helm Charts** is a curated collection of Helm charts maintained by [Douglas Cabrera](https://github.com/cabrera-evil), designed for scalable, secure, and production-grade Kubernetes deployments. Each chart is versioned, configurable, and follows Helm best practices to ensure compatibility and maintainability across environments.
+
+# How to use this repository
+
+## Add the repository to your Helm client
+
+```bash
+helm repo add cabrera-evil https://cabrera-evil.github.io/charts/
+```
+
+## Update your local Helm cache
+
+```bash
+helm repo update
+```
+
+## Install a chart
+
+```bash
+helm install <release-name> cabrera-evil/<chart-name> [flags]
+```
+
+> Use `--values <file.yaml>` or `--set key=value` to override configuration options.
+
+# Available charts
 
 | Chart Name                         | Description                           | Version |
 | ---------------------------------- | ------------------------------------- | ------- |
 | **[deploy-chart](./deploy-chart)** | Generic Helm chart for app deployment | 0.1.0   |
 | *(More coming soon)*               | *(Chart details will be listed here)* | -       |
 
-> ℹ️ Each chart includes its own `README.md` for configuration and usage details.
+> Each chart includes a dedicated `README.md` with usage instructions and configurable parameters.
 
-## 🛠️ Local Development
+# License
 
-1. **Lint a chart**
-
-    ```bash
-    helm lint charts/<chart-name>
-    ```
-
-2. **Package a chart**
-
-    ```bash
-    helm package charts/<chart-name>
-    ```
-
-3. **Serve charts locally**
-
-    ```bash
-    helm repo serve
-    ```
-
-## 🌍 GitHub Pages Integration
-
-This repository uses GitHub Pages to host the Helm chart index.
-
-1. **Update the chart index**
-
-```bash
-helm repo index . --url https://cabrera-evil.github.io/charts/
-```
-
-## 📄 License
-
-This Helm chart is licensed under the [MIT License](LICENSE).
-
----
-
-© 2025 Douglas Cabrera · [cabrera-dev.com](https://cabrera-dev.com)
+This project is released under the [MIT License](https://github.com/cabrera-evil/charts/blob/main/LICENSE).
