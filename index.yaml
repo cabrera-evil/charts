@@ -3,7 +3,17 @@ entries:
   deploy-chart:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2025-06-25T21:40:35.587294851-06:00"
+    created: "2025-09-10T11:46:53.525565681-06:00"
+    description: Generic Helm chart for app deployment
+    digest: 588b45b613dec0fa87d173b061b25ecbf2ba89c196dca82de5aac9305edf6d55
+    name: deploy-chart
+    type: application
+    urls:
+    - https://cabrera-evil.github.io/charts/charts/deploy-chart-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2025-09-10T11:46:53.525212476-06:00"
     description: Generic Helm chart for app deployment
     digest: ae809d468c7bcca859745092dbadb8ea1b44c90f78762fe12393a69581ee3e89
     name: deploy-chart
@@ -11,4 +21,4 @@ entries:
     urls:
     - https://cabrera-evil.github.io/charts/charts/deploy-chart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-25T21:40:35.586682922-06:00"
+generated: "2025-09-10T11:46:53.524729717-06:00"

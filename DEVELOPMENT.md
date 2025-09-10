@@ -29,7 +29,7 @@ Ensure you have the following tools installed:
 To verify that a chart follows Helm's best practices:
 
 ```bash
-helm lint charts/<chart-name>
+helm lint <chart-name>
 ```
 
 ## Package a chart
@@ -37,7 +37,7 @@ helm lint charts/<chart-name>
 To generate a `.tgz` archive:
 
 ```bash
-helm package charts/<chart-name>
+helm package <chart-name>
 ```
 
 The package will be output in the current directory.
