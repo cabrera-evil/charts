@@ -4,6 +4,10 @@ metadata:
   name: {{ include "deploy-chart.fullname" . }}
   labels:
     {{- include "deploy-chart.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -11,5 +15,8 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
   selector:
     {{- include "deploy-chart.selectorLabels" . | nindent 4 }}
