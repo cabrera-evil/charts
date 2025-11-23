@@ -124,9 +124,9 @@ Runs when `Chart.yaml` is modified on master. Automatically:
 ### Release Process (Automated)
 
 1. **Make changes** to chart templates or values
-2. **Bump version** in `deploy-chart/Chart.yaml`
+2. **Bump version** in `helm-charts/deploy-chart/Chart.yaml`
    ```bash
-   vim deploy-chart/Chart.yaml
+   vim helm-charts/deploy-chart/Chart.yaml
    # Change: version: 0.2.0 → version: 0.3.0
    ```
 3. **Create PR** - CI will validate changes and check version bump
@@ -145,11 +145,11 @@ If you need to release manually:
 
 ```bash
 # 1. Bump version in Chart.yaml
-vim deploy-chart/Chart.yaml
+vim helm-charts/deploy-chart/Chart.yaml
 
 # 2. Lint and package
-helm lint deploy-chart
-helm package deploy-chart
+helm lint helm-charts/deploy-chart
+helm package helm-charts/deploy-chart
 
 # 3. Update index (if you have gh-pages checked out)
 helm repo index . --url https://cabrera-evil.github.io/charts/

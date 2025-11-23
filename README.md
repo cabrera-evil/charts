@@ -52,8 +52,8 @@ helm install <release-name> cabrera-evil/<chart-name> [flags]
 
 | Chart Name                         | Description                           | Version |
 | ---------------------------------- | ------------------------------------- | ------- |
-| **[deploy-chart](./deploy-chart)** | Generic Helm chart for app deployment | 0.1.0   |
-| *(More coming soon)*               | *(Chart details will be listed here)* | -       |
+| **[deploy-chart](./helm-charts/deploy-chart)** | Generic Helm chart for app deployment | 0.2.0   |
+| _(More coming soon)_               | _(Chart details will be listed here)_ | -       |
 
 > Each chart includes a dedicated `README.md` with usage instructions and configurable parameters.
 
