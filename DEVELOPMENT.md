@@ -62,10 +62,124 @@ helm repo index . --url https://cabrera-evil.github.io/charts/
 
 Make sure to commit the updated `index.yaml`.
 
+## Versioning workflow
+
+The chart version in `Chart.yaml` is **NOT automatically updated**. You must manually increment it before publishing.
+
+**SemVer guidelines:**
+- Patch (0.2.0 → 0.2.1): Bug fixes, minor improvements
+- Minor (0.2.0 → 0.3.0): New features, backward compatible
+- Major (0.2.0 → 1.0.0): Breaking changes
+
+**Before publishing:**
+1. Edit `Chart.yaml` and increment `version`
+2. Update `appVersion` if the default app version changes
+3. Run `helm lint <chart-name>`
+4. Run `helm package <chart-name>`
+5. Update repository index
+
+## Managing dependencies
+
+If your chart depends on other charts, add them to `Chart.yaml`:
+
+```yaml
+dependencies:
+  - name: redis
+    version: 17.11.3
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+```
+
+Then run:
+```bash
+helm dependency update <chart-name>
+```
+
+This generates:
+- `Chart.lock` - Lockfile with exact versions and checksums
+- `charts/` directory - Downloaded dependency `.tgz` files
+
+**Note:** `deploy-chart` currently has no dependencies, so no `Chart.lock` is needed.
+
+## Automated CI/CD
+
+This repository uses GitHub Actions to automate chart testing, validation, and publishing.
+
+### Workflows
+
+#### 1. Lint and Test (`lint-test.yaml`)
+
+Runs on every PR and push to master. Performs:
+- ✅ Chart linting with `helm lint` and `ct lint`
+- ✅ Template validation with all features enabled
+- ✅ Security scanning with Trivy
+- ✅ SemVer version format validation
+- ✅ Metadata validation (required fields)
+- ✅ Installation testing in a Kind cluster
+
+#### 2. PR Version Check (`pr-check.yaml`)
+
+Runs on every PR. Enforces version bumping:
+- 🔍 Detects if chart files were modified
+- ⚠️  Fails if version wasn't bumped when chart changed
+- 💬 Comments on PR when version bump is detected
+- 📊 Provides clear instructions if version bump is needed
+
+#### 3. Release (`release.yaml`)
+
+Runs when `Chart.yaml` is modified on master. Automatically:
+- 📦 Packages the chart
+- 🏷️  Creates a GitHub release with tag `deploy-chart-X.Y.Z`
+- 📝 Generates changelog from git commits
+- 🚀 Publishes to GitHub Pages
+- 📊 Updates the Helm repository index
+
+### Release Process (Automated)
+
+1. **Make changes** to chart templates or values
+2. **Bump version** in `deploy-chart/Chart.yaml`
+   ```bash
+   vim deploy-chart/Chart.yaml
+   # Change: version: 0.2.0 → version: 0.3.0
+   ```
+3. **Create PR** - CI will validate changes and check version bump
+4. **Merge PR** - Chart is automatically released!
+
+The release workflow will:
+- Create tag `deploy-chart-0.3.0`
+- Create GitHub release with changelog
+- Publish to https://cabrera-evil.github.io/charts/
+- Make chart immediately available via `helm repo update`
+
+### Manual Release (Not Recommended)
+
+If you need to release manually:
+
+```bash
+# 1. Bump version in Chart.yaml
+vim deploy-chart/Chart.yaml
+
+# 2. Lint and package
+helm lint deploy-chart
+helm package deploy-chart
+
+# 3. Update index (if you have gh-pages checked out)
+helm repo index . --url https://cabrera-evil.github.io/charts/
+
+# 4. Commit and push
+git add .
+git commit -m "chore: release deploy-chart X.Y.Z"
+git push
+```
+
+**Note:** Manual releases should be avoided. The automated workflow ensures consistency and proper versioning.
+
 ## Contribution guidelines
 
 - Ensure each chart contains a valid `Chart.yaml` and `README.md`.
 - Keep versioning consistent with [SemVer](https://semver.org/).
+- **Always bump the chart version** when modifying templates or values.
 - Prefer `values.yaml`-based configuration over hardcoding.
 - Validate templates using `helm template` for expected output.
 - All new charts or major changes must go through pull requests with review.
+- CI workflows must pass before merging.
