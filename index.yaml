@@ -2,6 +2,31 @@ apiVersion: v1
 entries:
   deploy-chart:
   - apiVersion: v2
+    appVersion: latest
+    created: "2025-11-23T23:24:23.344705748Z"
+    description: Generic Helm chart for app deployment
+    digest: 93eac920e11ccd896cb1ea8d9727ccc141d8ae4f75febe97cf09fe121d6625f3
+    home: https://github.com/cabrera-evil/charts
+    icon: https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.svg
+    keywords:
+    - deployment
+    - kubernetes
+    - generic
+    - application
+    - helm
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: contact@cabrera-dev.com
+      name: Douglas Cabrera
+      url: https://cabrera-dev.com
+    name: deploy-chart
+    sources:
+    - https://github.com/cabrera-evil/charts/tree/master/helm-charts/deploy-chart
+    type: application
+    urls:
+    - https://github.com/cabrera-evil/charts/releases/download/deploy-chart-0.2.0/deploy-chart-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.0.1
     created: "2025-09-10T11:46:53.525565681-06:00"
     description: Generic Helm chart for app deployment
@@ -21,4 +46,4 @@ entries:
     urls:
     - https://cabrera-evil.github.io/charts/charts/deploy-chart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-09-10T11:46:53.524729717-06:00"
+generated: "2025-11-23T23:24:23.344716849Z"
