@@ -67,11 +67,13 @@ Make sure to commit the updated `index.yaml`.
 The chart version in `Chart.yaml` is **NOT automatically updated**. You must manually increment it before publishing.
 
 **SemVer guidelines:**
+
 - Patch (0.2.0 → 0.2.1): Bug fixes, minor improvements
 - Minor (0.2.0 → 0.3.0): New features, backward compatible
 - Major (0.2.0 → 1.0.0): Breaking changes
 
 **Before publishing:**
+
 1. Edit `Chart.yaml` and increment `version`
 2. Update `appVersion` if the default app version changes
 3. Run `helm lint <chart-name>`
@@ -91,11 +93,13 @@ dependencies:
 ```
 
 Then run:
+
 ```bash
 helm dependency update <chart-name>
 ```
 
 This generates:
+
 - `Chart.lock` - Lockfile with exact versions and checksums
 - `charts/` directory - Downloaded dependency `.tgz` files
 
@@ -107,29 +111,12 @@ This repository uses GitHub Actions to automate chart testing, validation, and p
 
 ### Workflows
 
-#### 1. Lint and Test (`lint-test.yaml`)
-
-Runs on every PR and push to master. Performs:
-- ✅ Chart linting with `helm lint` and `ct lint`
-- ✅ Template validation with all features enabled
-- ✅ Security scanning with Trivy
-- ✅ SemVer version format validation
-- ✅ Metadata validation (required fields)
-- ✅ Installation testing in a Kind cluster
-
-#### 2. PR Version Check (`pr-check.yaml`)
-
-Runs on every PR. Enforces version bumping:
-- 🔍 Detects if chart files were modified
-- ⚠️  Fails if version wasn't bumped when chart changed
-- 💬 Comments on PR when version bump is detected
-- 📊 Provides clear instructions if version bump is needed
-
-#### 3. Release (`release.yaml`)
+#### 1. Release (`release.yaml`)
 
 Runs when `Chart.yaml` is modified on master. Automatically:
+
 - 📦 Packages the chart
-- 🏷️  Creates a GitHub release with tag `deploy-chart-X.Y.Z`
+- 🏷️ Creates a GitHub release with tag `deploy-chart-X.Y.Z`
 - 📝 Generates changelog from git commits
 - 🚀 Publishes to GitHub Pages
 - 📊 Updates the Helm repository index
@@ -146,6 +133,7 @@ Runs when `Chart.yaml` is modified on master. Automatically:
 4. **Merge PR** - Chart is automatically released!
 
 The release workflow will:
+
 - Create tag `deploy-chart-0.3.0`
 - Create GitHub release with changelog
 - Publish to https://cabrera-evil.github.io/charts/
