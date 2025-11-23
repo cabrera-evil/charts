@@ -1,0 +1,27 @@
+# chart-testing configuration
+# https://github.com/helm/chart-testing
+# Automatically discovers all charts in the repository
+
+remote: origin
+target-branch: master
+
+# Chart discovery settings
+chart-dirs:
+  - .  # Search from repository root
+excluded-charts: []  # No charts excluded
+
+# External chart repositories (for dependencies)
+chart-repos:
+  - bitnami=https://charts.bitnami.com/bitnami
+
+# Validation settings
+check-version-increment: true
+validate-maintainers: true
+validate-chart-schema: true
+
+# Helm settings
+helm-extra-args: --timeout 600s
+helm-extra-set-args: --set=service.type=ClusterIP
+
+# Testing settings
+all: false  # Only test changed charts
