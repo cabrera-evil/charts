@@ -35,6 +35,10 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install Python dependencies
+        run: |
+          pip install jsonschema pyyaml
+
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.6.1
 
@@ -143,12 +147,17 @@ jobs:
           for chart in $charts; do
             if [ -f "$chart/values.schema.json" ]; then
               echo "→ Validating $chart/values.schema.json..."
-              if helm template test-release "$chart" --validate; then
-                echo "✓ $chart: values.schema.json is valid"
-              else
-                echo "✗ $chart: values.schema.json validation failed"
+
+              # Validate JSON syntax
+              if ! jq empty "$chart/values.schema.json" 2>/dev/null; then
+                echo "✗ $chart: values.schema.json has invalid JSON syntax"
                 exit 1
               fi
+
+              # Validate that values conform to schema
+              CHART_PATH="$chart" python3 -c 'import json, yaml, sys, os; chart=os.environ["CHART_PATH"]; schema=json.load(open(f"{chart}/values.schema.json")); values=yaml.safe_load(open(f"{chart}/values.yaml")); from jsonschema import validate, ValidationError; validate(instance=values, schema=schema); print(f"✓ {chart}: values.yaml validates against schema")' || exit 1
+
+              echo "✓ $chart: values.schema.json is valid"
             fi
           done
 
