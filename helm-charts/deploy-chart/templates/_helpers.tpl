@@ -60,3 +60,79 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Generate checksum annotations for job pods to trigger restarts on config changes
+*/}}
+{{- define "deploy-chart.jobChecksumAnnotations" -}}
+{{- if .Values.configMap.enabled }}
+checksum/config: {{ .Values.configMap.data | toJson | sha256sum }}
+{{- end }}
+{{- if .Values.secret.enabled }}
+checksum/secret: {{ .Values.secret.data | toJson | sha256sum }}
+{{- end }}
+{{- end }}
+
+{{/*
+Merge labels from multiple sources for jobs
+Usage: include "deploy-chart.jobLabels" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults)
+*/}}
+{{- define "deploy-chart.jobLabels" -}}
+{{- $labels := dict }}
+{{- range $src := (list .jobsDefaults.labels .job.labels) }}
+{{- if $src }}
+{{- range $key, $val := $src }}
+{{- $_ := set $labels $key $val }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- toYaml $labels }}
+{{- end }}
+
+{{/*
+Merge annotations from multiple sources for jobs
+Usage: include "deploy-chart.jobAnnotations" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults)
+*/}}
+{{- define "deploy-chart.jobAnnotations" -}}
+{{- $annotations := dict }}
+{{- range $src := (list .jobsDefaults.annotations .job.annotations) }}
+{{- if $src }}
+{{- range $key, $val := $src }}
+{{- $_ := set $annotations $key $val }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- toYaml $annotations }}
+{{- end }}
+
+{{/*
+Merge pod labels from multiple sources for jobs
+Usage: include "deploy-chart.jobPodLabels" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults)
+*/}}
+{{- define "deploy-chart.jobPodLabels" -}}
+{{- $labels := dict }}
+{{- range $src := (list .root.Values.podLabels .jobsDefaults.podLabels .job.podLabels) }}
+{{- if $src }}
+{{- range $key, $val := $src }}
+{{- $_ := set $labels $key $val }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- toYaml $labels }}
+{{- end }}
+
+{{/*
+Merge pod annotations from multiple sources for jobs
+Usage: include "deploy-chart.jobPodAnnotations" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults)
+*/}}
+{{- define "deploy-chart.jobPodAnnotations" -}}
+{{- $annotations := dict }}
+{{- range $src := (list .root.Values.podAnnotations .jobsDefaults.podAnnotations .job.podAnnotations) }}
+{{- if $src }}
+{{- range $key, $val := $src }}
+{{- $_ := set $annotations $key $val }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- toYaml $annotations }}
+{{- end }}
