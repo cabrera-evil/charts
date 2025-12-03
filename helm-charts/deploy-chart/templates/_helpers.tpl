@@ -136,3 +136,102 @@ Usage: include "deploy-chart.jobPodAnnotations" (dict "root" $ "job" $job "jobsD
 {{- end }}
 {{- toYaml $annotations }}
 {{- end }}
+
+{{/*
+Return the proper image name
+Usage: include "deploy-chart.image" .
+*/}}
+{{- define "deploy-chart.image" -}}
+{{- $tag := .Values.image.tag | default .Chart.AppVersion }}
+{{- printf "%s:%s" .Values.image.repository $tag }}
+{{- end }}
+
+{{/*
+Return the proper container name
+Usage: include "deploy-chart.containerName" .
+*/}}
+{{- define "deploy-chart.containerName" -}}
+{{- default .Chart.Name .Values.containerName | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Generate checksum annotations for deployment pods
+Usage: include "deploy-chart.checksumAnnotations" .
+*/}}
+{{- define "deploy-chart.checksumAnnotations" -}}
+{{- if .Values.configMap.enabled }}
+checksum/config: {{ .Values.configMap.data | toJson | sha256sum }}
+{{- end }}
+{{- if .Values.secret.enabled }}
+checksum/secret: {{ .Values.secret.data | toJson | sha256sum }}
+{{- end }}
+{{- end }}
+
+{{/*
+Validate pod disruption budget configuration
+*/}}
+{{- define "deploy-chart.validatePDB" -}}
+{{- if and .Values.podDisruptionBudget.enabled }}
+{{- if and .Values.podDisruptionBudget.minAvailable .Values.podDisruptionBudget.maxUnavailable }}
+{{- fail "Cannot set both minAvailable and maxUnavailable in podDisruptionBudget" }}
+{{- end }}
+{{- if and (not .Values.podDisruptionBudget.minAvailable) (not .Values.podDisruptionBudget.maxUnavailable) }}
+{{- fail "Must set either minAvailable or maxUnavailable in podDisruptionBudget" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Return the appropriate apiVersion for HPA
+*/}}
+{{- define "deploy-chart.hpa.apiVersion" -}}
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
+{{- print "autoscaling/v2" }}
+{{- else }}
+{{- print "autoscaling/v2beta2" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Return the appropriate apiVersion for PodDisruptionBudget
+*/}}
+{{- define "deploy-chart.pdb.apiVersion" -}}
+{{- if .Capabilities.APIVersions.Has "policy/v1/PodDisruptionBudget" }}
+{{- print "policy/v1" }}
+{{- else }}
+{{- print "policy/v1beta1" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Generate common pod spec fields
+Usage: include "deploy-chart.podSpec" .
+*/}}
+{{- define "deploy-chart.podSpec" -}}
+{{- with .Values.priorityClassName }}
+priorityClassName: {{ . }}
+{{- end }}
+{{- with .Values.runtimeClassName }}
+runtimeClassName: {{ . }}
+{{- end }}
+{{- with .Values.schedulerName }}
+schedulerName: {{ . }}
+{{- end }}
+{{- if kindIs "bool" .Values.shareProcessNamespace }}
+shareProcessNamespace: {{ .Values.shareProcessNamespace }}
+{{- end }}
+{{- with .Values.dnsPolicy }}
+dnsPolicy: {{ . }}
+{{- end }}
+{{- with .Values.dnsConfig }}
+dnsConfig:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.hostAliases }}
+hostAliases:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.terminationGracePeriodSeconds }}
+terminationGracePeriodSeconds: {{ . }}
+{{- end }}
+{{- end }}
