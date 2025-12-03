@@ -14,6 +14,33 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: "chart-example"
 
+# Optional: override the container name (defaults to chart name)
+containerName: ""
+
+# Optional: override command and args
+command: []
+args: []
+
+# Deployment-specific labels and annotations
+deploymentLabels: {}
+deploymentAnnotations: {}
+
+# Deployment spec configuration
+revisionHistoryLimit: 10  # Number of old ReplicaSets to retain
+minReadySeconds: 0  # Minimum seconds for which a pod should be ready
+progressDeadlineSeconds: 600  # Seconds to wait for deployment progress
+
+# Pod scheduling and runtime configuration
+priorityClassName: ""  # Priority class for pod scheduling
+runtimeClassName: ""  # Runtime class for pod containers
+schedulerName: ""  # Custom scheduler name
+shareProcessNamespace: false  # Share process namespace between containers
+dnsPolicy: ""  # DNS policy (ClusterFirst, Default, None, ClusterFirstWithHostNet)
+dnsConfig: {}  # Custom DNS configuration
+hostAliases: []  # Host aliases for /etc/hosts
+terminationGracePeriodSeconds: 30  # Grace period for pod termination
+topologySpreadConstraints: []  # Pod topology spread constraints
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: false
@@ -21,27 +48,55 @@ serviceAccount:
   automount: true
   # Annotations to add to the service account
   annotations: {}
+  # Labels to add to the service account
+  labels: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+  # Image pull secrets to attach to the service account
+  imagePullSecrets: []
+  # Secrets to attach to the service account
+  secrets: []
 
 env: []
+envFrom: []  # Additional envFrom sources
 
 secret:
   enabled: false
   nameOverride: ""
-    # The secret data to be stored
-    # key1: value1
-    # key2: value2
+  type: Opaque  # Secret type (Opaque, kubernetes.io/tls, etc.)
+  immutable: false  # Make secret immutable
+  labels: {}
+  annotations: {}
+  # Data field - for MANUALLY base64 encoded values
+  # Use this if you have pre-encoded secrets or want full control
+  # Example:
+  #   data:
+  #     password: "bXktcGFzc3dvcmQ="  # Already base64 encoded
   data: {}
+  # String data - for RAW string values (RECOMMENDED)
+  # Kubernetes will automatically base64 encode these values
+  # Use this for easier secret management with raw values
+  # Example:
+  #   stringData:
+  #     username: "admin"
+  #     password: "my-password"
+  #     api_key: "abc123"
+  stringData: {}
 
 configMap:
   enabled: false
   nameOverride: ""
-  data:
-    # The config map data to be stored
+  immutable: false  # Make configmap immutable
+  labels: {}
+  annotations: {}
+  # The config map data to be stored
+  # Supports both string and complex data types
+  data: {}
     # key1: value1
     # key2: value2
+  # Binary data (base64 encoded values)
+  binaryData: {}
 
 podAnnotations: {}
 podLabels: {}
@@ -63,21 +118,54 @@ service:
   type: ClusterIP
   port: 80
   annotations: {}
+  labels: {}
   # Optionally set a specific nodePort (only for NodePort/LoadBalancer)
   # nodePort: 30080
+  # Advanced service configuration
+  clusterIP: ""  # Specific cluster IP or "None" for headless service
+  externalIPs: []  # List of external IPs
+  loadBalancerIP: ""  # Specific load balancer IP
+  loadBalancerSourceRanges: []  # Traffic source ranges for LoadBalancer
+  externalTrafficPolicy: ""  # Local or Cluster
+  sessionAffinity: ""  # ClientIP or None
+  sessionAffinityConfig: {}  # Session affinity configuration
+  healthCheckNodePort: 0  # Health check node port for LoadBalancer
+  ipFamilyPolicy: ""  # SingleStack, PreferDualStack, or RequireDualStack
+  ipFamilies: []  # IP families (IPv4, IPv6)
+  # Multiple ports configuration (overrides single port above)
+  ports: []
+  # - name: http
+  #   port: 80
+  #   targetPort: http
+  #   protocol: TCP
+  #   nodePort: 30080  # Optional
+  #   appProtocol: http  # Optional application protocol
 
 ingress:
   enabled: false
   className: traefik
+  labels: {}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
+  # Optional default backend
+  defaultBackend: {}
+    # service:
+    #   name: default-backend
+    #   port:
+    #     number: 80
   hosts:
     - host: chart-example.local
       paths:
         - path: /
           pathType: Prefix
+          # Optional: per-path backend override
+          backend: {}
+            # service:
+            #   name: custom-service
+            #   port:
+            #     number: 8080
   tls:
     - hosts:
         - chart-example.local
@@ -134,6 +222,31 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
+  labels: {}
+  annotations: {}
+  # Custom metrics (overrides CPU/Memory targets if set)
+  metrics: []
+  # - type: Pods
+  #   pods:
+  #     metric:
+  #       name: custom_metric
+  #     target:
+  #       type: AverageValue
+  #       averageValue: "100"
+  # Scaling behavior (k8s 1.23+)
+  behavior: {}
+    # scaleDown:
+    #   stabilizationWindowSeconds: 300
+    #   policies:
+    #     - type: Percent
+    #       value: 10
+    #       periodSeconds: 60
+    # scaleUp:
+    #   stabilizationWindowSeconds: 0
+    #   policies:
+    #     - type: Percent
+    #       value: 100
+    #       periodSeconds: 15
 
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -165,11 +278,17 @@ strategy:
 podDisruptionBudget:
   enabled: false
   minAvailable: 1
-  # maxUnavailable: 1
+  # maxUnavailable: 1  # Cannot set both minAvailable and maxUnavailable
+  labels: {}
+  annotations: {}
+  # Unhealthy pod eviction policy (k8s 1.26+)
+  unhealthyPodEvictionPolicy: ""  # IfHealthyBudget or AlwaysAllow
 
 # Network Policy
 networkPolicy:
   enabled: false
+  labels: {}
+  annotations: {}
   policyTypes:
     - Ingress
     - Egress
@@ -200,6 +319,18 @@ sidecars: []
 # - name: sidecar
 #   image: busybox:1.28
 #   command: ['sh', '-c', 'tail -f /dev/null']
+
+# Extra containers (alternative to sidecars)
+extraContainers: []
+
+# Container ports configuration (overrides default http port)
+containerPorts: []
+# - name: http
+#   containerPort: 8080
+#   protocol: TCP
+# - name: metrics
+#   containerPort: 9090
+#   protocol: TCP
 
 # Shared defaults applied to all jobs and cronjobs unless overridden per job
 # These provide sensible defaults for common job configurations
