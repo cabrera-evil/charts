@@ -165,6 +165,335 @@
     },
     "affinity": {
       "type": "object"
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "annotations": {
+            "type": "object"
+          },
+          "labels": {
+            "type": "object"
+          },
+          "hooks": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "pre-install",
+                "post-install",
+                "pre-delete",
+                "post-delete",
+                "pre-upgrade",
+                "post-upgrade",
+                "pre-rollback",
+                "post-rollback",
+                "test"
+              ]
+            }
+          },
+          "hookWeight": {
+            "type": ["string", "integer"]
+          },
+          "hookDeletePolicy": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["before-hook-creation", "hook-succeeded", "hook-failed"]
+            }
+          },
+          "schedule": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "string"
+          },
+          "concurrencyPolicy": {
+            "type": "string",
+            "enum": ["Allow", "Forbid", "Replace"]
+          },
+          "startingDeadlineSeconds": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "successfulJobsHistoryLimit": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "failedJobsHistoryLimit": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "completions": {
+            "type": ["integer", "null"],
+            "minimum": 1
+          },
+          "parallelism": {
+            "type": ["integer", "null"],
+            "minimum": 1
+          },
+          "backoffLimit": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "ttlSecondsAfterFinished": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "activeDeadlineSeconds": {
+            "type": ["integer", "null"],
+            "minimum": 1
+          },
+          "completionMode": {
+            "type": ["string", "null"],
+            "enum": ["NonIndexed", "Indexed", null]
+          },
+          "suspend": {
+            "type": "boolean"
+          },
+          "backoffLimitPerIndex": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "maxFailedIndexes": {
+            "type": ["integer", "null"],
+            "minimum": 1
+          },
+          "podReplacementPolicy": {
+            "type": ["string", "null"],
+            "enum": ["TerminatingOrFailed", "Failed", null]
+          },
+          "podFailurePolicy": {
+            "type": "object"
+          },
+          "successPolicy": {
+            "type": "object"
+          },
+          "restartPolicy": {
+            "type": "string",
+            "enum": ["Never", "OnFailure"]
+          },
+          "serviceAccountName": {
+            "type": "string"
+          },
+          "command": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "env": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "envFrom": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "image": {
+            "type": "object",
+            "properties": {
+              "repository": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pullPolicy": {
+                "type": "string",
+                "enum": ["Always", "IfNotPresent", "Never"]
+              },
+              "tag": {
+                "type": "string"
+              }
+            }
+          },
+          "imagePullSecrets": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "podAnnotations": {
+            "type": "object"
+          },
+          "podLabels": {
+            "type": "object"
+          },
+          "podSecurityContext": {
+            "type": "object"
+          },
+          "securityContext": {
+            "type": "object"
+          },
+          "resources": {
+            "type": "object"
+          },
+          "initContainers": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "sidecars": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "volumeMounts": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "volumes": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "nodeSelector": {
+            "type": "object"
+          },
+          "tolerations": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "affinity": {
+            "type": "object"
+          },
+          "priorityClassName": {
+            "type": "string"
+          },
+          "runtimeClassName": {
+            "type": "string"
+          },
+          "schedulerName": {
+            "type": "string"
+          },
+          "shareProcessNamespace": {
+            "type": "boolean"
+          },
+          "dnsPolicy": {
+            "type": ["string", "null"],
+            "enum": ["ClusterFirst", "ClusterFirstWithHostNet", "Default", "None", null]
+          },
+          "dnsConfig": {
+            "type": "object"
+          },
+          "hostAliases": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "terminationGracePeriodSeconds": {
+            "type": ["integer", "null"],
+            "minimum": 0
+          },
+          "topologySpreadConstraints": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "jobsDefaults": {
+      "type": "object",
+      "properties": {
+        "annotations": { "type": "object" },
+        "labels": { "type": "object" },
+        "completions": { "type": ["integer", "null"], "minimum": 1 },
+        "parallelism": { "type": ["integer", "null"], "minimum": 1 },
+        "backoffLimit": { "type": ["integer", "null"], "minimum": 0 },
+        "ttlSecondsAfterFinished": { "type": ["integer", "null"], "minimum": 0 },
+        "activeDeadlineSeconds": { "type": ["integer", "null"], "minimum": 1 },
+        "completionMode": {
+          "type": ["string", "null"],
+          "enum": ["NonIndexed", "Indexed", null]
+        },
+        "suspend": { "type": "boolean" },
+        "backoffLimitPerIndex": { "type": ["integer", "null"], "minimum": 0 },
+        "maxFailedIndexes": { "type": ["integer", "null"], "minimum": 1 },
+        "podReplacementPolicy": {
+          "type": ["string", "null"],
+          "enum": ["TerminatingOrFailed", "Failed", null]
+        },
+        "concurrencyPolicy": {
+          "type": "string",
+          "enum": ["Allow", "Forbid", "Replace"]
+        },
+        "startingDeadlineSeconds": { "type": ["integer", "null"], "minimum": 0 },
+        "successfulJobsHistoryLimit": { "type": ["integer", "null"], "minimum": 0 },
+        "failedJobsHistoryLimit": { "type": ["integer", "null"], "minimum": 0 },
+        "timeZone": { "type": ["string", "null"] },
+        "restartPolicy": { "type": "string", "enum": ["Never", "OnFailure"] },
+        "serviceAccountName": { "type": "string" },
+        "priorityClassName": { "type": "string" },
+        "runtimeClassName": { "type": "string" },
+        "schedulerName": { "type": "string" },
+        "shareProcessNamespace": { "type": "boolean" },
+        "dnsPolicy": {
+          "type": ["string", "null"],
+          "enum": ["ClusterFirst", "ClusterFirstWithHostNet", "Default", "None", null]
+        },
+        "dnsConfig": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "terminationGracePeriodSeconds": { "type": ["integer", "null"], "minimum": 0 },
+        "topologySpreadConstraints": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "env": { "type": "array", "items": { "type": "object" } },
+        "envFrom": { "type": "array", "items": { "type": "object" } },
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string", "minLength": 1 },
+            "pullPolicy": { "type": "string", "enum": ["Always", "IfNotPresent", "Never"] },
+            "tag": { "type": "string" }
+          }
+        },
+        "imagePullSecrets": { "type": "array", "items": { "type": "object" } },
+        "podAnnotations": { "type": "object" },
+        "podLabels": { "type": "object" },
+        "podSecurityContext": { "type": "object" },
+        "securityContext": { "type": "object" },
+        "resources": { "type": "object" },
+        "initContainers": { "type": "array", "items": { "type": "object" } },
+        "sidecars": { "type": "array", "items": { "type": "object" } },
+        "volumeMounts": { "type": "array", "items": { "type": "object" } },
+        "volumes": { "type": "array", "items": { "type": "object" } },
+        "nodeSelector": { "type": "object" },
+        "tolerations": { "type": "array", "items": { "type": "object" } },
+        "affinity": { "type": "object" }
+      }
     }
   }
 }
