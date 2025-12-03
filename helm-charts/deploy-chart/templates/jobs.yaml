@@ -1,0 +1,327 @@
+{{- if .Values.jobs }}
+{{- $jobsDefaults := default (dict) .Values.jobsDefaults }}
+{{- $jobDefaultsImage := default (dict) $jobsDefaults.image }}
+{{- range $index, $job := .Values.jobs }}
+{{- if (default true $job.enabled) }}
+{{- $isCronJob := and (hasKey $job "schedule") $job.schedule }}
+{{- $jobName := printf "%s-%s" (include "deploy-chart.fullname" $) $job.name | trunc 63 | trimSuffix "-" }}
+{{- $jobContainerName := default "job" $job.name | trunc 63 | trimSuffix "-" }}
+
+{{/*
+Image resolution with fallback chain: job.image -> jobsDefaults.image -> global image
+*/}}
+{{- $jobImage := default (dict) $job.image }}
+{{- $jobImageRepo := coalesce (get $jobImage "repository") (get $jobDefaultsImage "repository") $.Values.image.repository }}
+{{- $jobImageTag := coalesce (get $jobImage "tag") (get $jobDefaultsImage "tag") $.Values.image.tag $.Chart.AppVersion }}
+{{- $jobImagePullPolicy := coalesce (get $jobImage "pullPolicy") (get $jobDefaultsImage "pullPolicy") $.Values.image.pullPolicy }}
+
+{{/*
+Job spec configuration with defaults
+*/}}
+{{- $jobCompletions := coalesce $job.completions $jobsDefaults.completions }}
+{{- $jobParallelism := coalesce $job.parallelism $jobsDefaults.parallelism }}
+{{- $jobBackoffLimit := coalesce $job.backoffLimit $jobsDefaults.backoffLimit }}
+{{- $jobTTL := coalesce $job.ttlSecondsAfterFinished $jobsDefaults.ttlSecondsAfterFinished }}
+{{- $jobActiveDeadline := coalesce $job.activeDeadlineSeconds $jobsDefaults.activeDeadlineSeconds }}
+{{- $jobCompletionMode := coalesce $job.completionMode $jobsDefaults.completionMode }}
+{{- $jobBackoffLimitPerIndex := coalesce $job.backoffLimitPerIndex $jobsDefaults.backoffLimitPerIndex }}
+{{- $jobMaxFailedIndexes := coalesce $job.maxFailedIndexes $jobsDefaults.maxFailedIndexes }}
+{{- $jobPodReplacementPolicy := coalesce $job.podReplacementPolicy $jobsDefaults.podReplacementPolicy }}
+{{- $jobSuspend := kindIs "bool" $job.suspend | ternary $job.suspend (kindIs "bool" $jobsDefaults.suspend | ternary $jobsDefaults.suspend nil) }}
+
+{{/*
+Pod spec configuration with defaults and inheritance
+*/}}
+{{- $restartPolicy := default "OnFailure" (coalesce $job.restartPolicy $jobsDefaults.restartPolicy) }}
+{{- $serviceAccountName := default (include "deploy-chart.serviceAccountName" $) (coalesce $job.serviceAccountName $jobsDefaults.serviceAccountName) }}
+{{- $podSecurityContext := coalesce $job.podSecurityContext $jobsDefaults.podSecurityContext $.Values.podSecurityContext }}
+{{- $securityContext := coalesce $job.securityContext $jobsDefaults.securityContext $.Values.securityContext }}
+{{- $resources := coalesce $job.resources $jobsDefaults.resources $.Values.resources }}
+{{- $nodeSelector := coalesce $job.nodeSelector $jobsDefaults.nodeSelector $.Values.nodeSelector }}
+{{- $tolerations := coalesce $job.tolerations $jobsDefaults.tolerations $.Values.tolerations }}
+{{- $affinity := coalesce $job.affinity $jobsDefaults.affinity $.Values.affinity }}
+{{- $priorityClassName := coalesce $job.priorityClassName $jobsDefaults.priorityClassName }}
+{{- $terminationGracePeriodSeconds := coalesce $job.terminationGracePeriodSeconds $jobsDefaults.terminationGracePeriodSeconds }}
+{{- $topologySpreadConstraints := coalesce $job.topologySpreadConstraints $jobsDefaults.topologySpreadConstraints }}
+{{- $runtimeClassName := coalesce $job.runtimeClassName $jobsDefaults.runtimeClassName }}
+{{- $schedulerName := coalesce $job.schedulerName $jobsDefaults.schedulerName }}
+{{- $shareProcessNamespace := coalesce $job.shareProcessNamespace $jobsDefaults.shareProcessNamespace }}
+{{- $dnsPolicy := coalesce $job.dnsPolicy $jobsDefaults.dnsPolicy }}
+{{- $dnsConfig := coalesce $job.dnsConfig $jobsDefaults.dnsConfig }}
+{{- $hostAliases := coalesce $job.hostAliases $jobsDefaults.hostAliases }}
+
+{{/*
+Container and volume configuration
+*/}}
+{{- $imagePullSecrets := concat (default (list) $.Values.imagePullSecrets) (default (list) $jobsDefaults.imagePullSecrets) (default (list) $job.imagePullSecrets) }}
+{{- $initContainers := concat (default (list) $.Values.initContainers) (default (list) $jobsDefaults.initContainers) (default (list) $job.initContainers) }}
+{{- $sidecars := concat (default (list) $.Values.sidecars) (default (list) $jobsDefaults.sidecars) (default (list) $job.sidecars) }}
+{{- $env := concat (default (list) $.Values.env) (default (list) $jobsDefaults.env) (default (list) $job.env) }}
+{{- $envFrom := concat (default (list) $jobsDefaults.envFrom) (default (list) $job.envFrom) }}
+{{- $volumeMounts := concat (default (list) $.Values.volumeMounts) (default (list) $jobsDefaults.volumeMounts) (default (list) $job.volumeMounts) }}
+{{- $volumes := concat (default (list) $.Values.volumes) (default (list) $jobsDefaults.volumes) (default (list) $job.volumes) }}
+
+{{/*
+CronJob specific configuration
+*/}}
+{{- $cronSchedule := $job.schedule }}
+{{- $cronConcurrencyPolicy := default "Allow" (coalesce $job.concurrencyPolicy $jobsDefaults.concurrencyPolicy) }}
+{{- $cronStartingDeadlineSeconds := coalesce $job.startingDeadlineSeconds $jobsDefaults.startingDeadlineSeconds }}
+{{- $cronSuccessfulJobsHistoryLimit := coalesce $job.successfulJobsHistoryLimit $jobsDefaults.successfulJobsHistoryLimit }}
+{{- $cronFailedJobsHistoryLimit := coalesce $job.failedJobsHistoryLimit $jobsDefaults.failedJobsHistoryLimit }}
+{{- $cronSuspend := kindIs "bool" $job.suspend | ternary $job.suspend (kindIs "bool" $jobsDefaults.suspend | ternary $jobsDefaults.suspend nil) }}
+{{- $cronTimeZone := coalesce $job.timeZone $jobsDefaults.timeZone }}
+
+{{- if gt $index 0 }}
+---
+{{- end }}
+{{- if $isCronJob }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $jobName }}
+  labels:
+    {{- include "deploy-chart.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: cronjob
+    {{- $cronJobLabels := include "deploy-chart.jobLabels" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults) | fromYaml }}
+    {{- if $cronJobLabels }}
+    {{- toYaml $cronJobLabels | nindent 4 }}
+    {{- end }}
+  {{- $annotations := include "deploy-chart.jobAnnotations" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults) | fromYaml }}
+  {{- if $annotations }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: {{ $cronSchedule | quote }}
+  {{- if $cronTimeZone }}
+  timeZone: {{ $cronTimeZone | quote }}
+  {{- end }}
+  concurrencyPolicy: {{ $cronConcurrencyPolicy }}
+  {{- if $cronStartingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ $cronStartingDeadlineSeconds }}
+  {{- end }}
+  {{- if kindIs "bool" $cronSuspend }}
+  suspend: {{ $cronSuspend }}
+  {{- end }}
+  {{- if $cronSuccessfulJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ $cronSuccessfulJobsHistoryLimit }}
+  {{- end }}
+  {{- if $cronFailedJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ $cronFailedJobsHistoryLimit }}
+  {{- end }}
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "deploy-chart.labels" $ | nindent 8 }}
+        app.kubernetes.io/component: cronjob
+        {{- $jobTemplateLabels := include "deploy-chart.jobLabels" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults) | fromYaml }}
+        {{- if $jobTemplateLabels }}
+        {{- toYaml $jobTemplateLabels | nindent 8 }}
+        {{- end }}
+      {{- if $annotations }}
+      annotations:
+        {{- toYaml $annotations | nindent 8 }}
+      {{- end }}
+    spec:
+{{- else }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $jobName }}
+  labels:
+    {{- include "deploy-chart.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: job
+    {{- $jobLabels := include "deploy-chart.jobLabels" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults) | fromYaml }}
+    {{- if $jobLabels }}
+    {{- toYaml $jobLabels | nindent 4 }}
+    {{- end }}
+  {{- $annotations := include "deploy-chart.jobAnnotations" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults) | fromYaml }}
+  {{- with $job.hooks }}
+  {{- if $annotations }}
+  {{- $_ := set $annotations "helm.sh/hook" (join "," .) }}
+  {{- else }}
+  {{- $annotations = dict "helm.sh/hook" (join "," .) }}
+  {{- end }}
+  {{- end }}
+  {{- with $job.hookWeight }}
+  {{- if $annotations }}
+  {{- $_ := set $annotations "helm.sh/hook-weight" (toString .) }}
+  {{- else }}
+  {{- $annotations = dict "helm.sh/hook-weight" (toString .) }}
+  {{- end }}
+  {{- end }}
+  {{- with $job.hookDeletePolicy }}
+  {{- if $annotations }}
+  {{- $_ := set $annotations "helm.sh/hook-delete-policy" (join "," .) }}
+  {{- else }}
+  {{- $annotations = dict "helm.sh/hook-delete-policy" (join "," .) }}
+  {{- end }}
+  {{- end }}
+  {{- if $annotations }}
+  annotations:
+    {{- toYaml $annotations | nindent 4 }}
+  {{- end }}
+spec:
+{{- end }}
+      {{- if $jobTTL }}
+      ttlSecondsAfterFinished: {{ $jobTTL }}
+      {{- end }}
+      {{- if $jobCompletions }}
+      completions: {{ $jobCompletions }}
+      {{- end }}
+      {{- if $jobParallelism }}
+      parallelism: {{ $jobParallelism }}
+      {{- end }}
+      {{- if $jobBackoffLimit }}
+      backoffLimit: {{ $jobBackoffLimit }}
+      {{- end }}
+      {{- if $jobActiveDeadline }}
+      activeDeadlineSeconds: {{ $jobActiveDeadline }}
+      {{- end }}
+      {{- if $jobCompletionMode }}
+      completionMode: {{ $jobCompletionMode }}
+      {{- end }}
+      {{- if and (kindIs "bool" $jobSuspend) (not $isCronJob) }}
+      suspend: {{ $jobSuspend }}
+      {{- end }}
+      {{- if $jobBackoffLimitPerIndex }}
+      backoffLimitPerIndex: {{ $jobBackoffLimitPerIndex }}
+      {{- end }}
+      {{- if $jobMaxFailedIndexes }}
+      maxFailedIndexes: {{ $jobMaxFailedIndexes }}
+      {{- end }}
+      {{- if $jobPodReplacementPolicy }}
+      podReplacementPolicy: {{ $jobPodReplacementPolicy }}
+      {{- end }}
+      {{- with $job.podFailurePolicy }}
+      podFailurePolicy:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $job.successPolicy }}
+      successPolicy:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      template:
+        metadata:
+          labels:
+            {{- include "deploy-chart.selectorLabels" $ | nindent 12 }}
+            app.kubernetes.io/component: {{ if $isCronJob }}cronjob{{ else }}job{{ end }}
+            {{- $podLabels := include "deploy-chart.jobPodLabels" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults) | fromYaml }}
+            {{- if $podLabels }}
+            {{- toYaml $podLabels | nindent 12 }}
+            {{- end }}
+          {{- $podAnnotations := include "deploy-chart.jobPodAnnotations" (dict "root" $ "job" $job "jobsDefaults" $jobsDefaults) | fromYaml }}
+          {{- $checksumAnnotations := include "deploy-chart.jobChecksumAnnotations" $ | fromYaml }}
+          {{- $mergedPodAnnotations := merge (default dict $podAnnotations) (default dict $checksumAnnotations) }}
+          {{- if $mergedPodAnnotations }}
+          annotations:
+            {{- toYaml $mergedPodAnnotations | nindent 12 }}
+          {{- end }}
+        spec:
+          serviceAccountName: {{ $serviceAccountName }}
+          restartPolicy: {{ $restartPolicy }}
+          {{- with $priorityClassName }}
+          priorityClassName: {{ . }}
+          {{- end }}
+          {{- with $runtimeClassName }}
+          runtimeClassName: {{ . }}
+          {{- end }}
+          {{- with $schedulerName }}
+          schedulerName: {{ . }}
+          {{- end }}
+          {{- if kindIs "bool" $shareProcessNamespace }}
+          shareProcessNamespace: {{ $shareProcessNamespace }}
+          {{- end }}
+          {{- with $dnsPolicy }}
+          dnsPolicy: {{ . }}
+          {{- end }}
+          {{- with $dnsConfig }}
+          dnsConfig:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $hostAliases }}
+          hostAliases:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $podSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $terminationGracePeriodSeconds }}
+          terminationGracePeriodSeconds: {{ . }}
+          {{- end }}
+          {{- with $initContainers }}
+          initContainers:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: {{ $jobContainerName }}
+              {{- with $securityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              image: "{{ $jobImageRepo }}:{{ $jobImageTag }}"
+              imagePullPolicy: {{ $jobImagePullPolicy }}
+              {{- with $job.command }}
+              command:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with $job.args }}
+              args:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- if $env }}
+              env:
+                {{- toYaml $env | nindent 16 }}
+              {{- end }}
+              {{- if or $envFrom (or $.Values.secret.enabled $.Values.configMap.enabled) }}
+              envFrom:
+                {{- if $.Values.secret.enabled }}
+                - secretRef:
+                    name: {{ include "deploy-chart.fullname" $ }}-secret
+                {{- end }}
+                {{- if $.Values.configMap.enabled }}
+                - configMapRef:
+                    name: {{ include "deploy-chart.fullname" $ }}-config
+                {{- end }}
+                {{- with $envFrom }}
+                {{- toYaml . | nindent 16 }}
+                {{- end }}
+              {{- end }}
+              {{- if $volumeMounts }}
+              volumeMounts:
+                {{- toYaml $volumeMounts | nindent 16 }}
+              {{- end }}
+              resources:
+                {{- toYaml $resources | nindent 16 }}
+            {{- with $sidecars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with $volumes }}
+          volumes:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $topologySpreadConstraints }}
+          topologySpreadConstraints:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

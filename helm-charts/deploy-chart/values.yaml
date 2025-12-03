@@ -14,6 +14,33 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: "chart-example"
 
+# Optional: override the container name (defaults to chart name)
+containerName: ""
+
+# Optional: override command and args
+command: []
+args: []
+
+# Deployment-specific labels and annotations
+deploymentLabels: {}
+deploymentAnnotations: {}
+
+# Deployment spec configuration
+revisionHistoryLimit: 10  # Number of old ReplicaSets to retain
+minReadySeconds: 0  # Minimum seconds for which a pod should be ready
+progressDeadlineSeconds: 600  # Seconds to wait for deployment progress
+
+# Pod scheduling and runtime configuration
+priorityClassName: ""  # Priority class for pod scheduling
+runtimeClassName: ""  # Runtime class for pod containers
+schedulerName: ""  # Custom scheduler name
+shareProcessNamespace: false  # Share process namespace between containers
+dnsPolicy: ""  # DNS policy (ClusterFirst, Default, None, ClusterFirstWithHostNet)
+dnsConfig: {}  # Custom DNS configuration
+hostAliases: []  # Host aliases for /etc/hosts
+terminationGracePeriodSeconds: 30  # Grace period for pod termination
+topologySpreadConstraints: []  # Pod topology spread constraints
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: false
@@ -21,27 +48,55 @@ serviceAccount:
   automount: true
   # Annotations to add to the service account
   annotations: {}
+  # Labels to add to the service account
+  labels: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+  # Image pull secrets to attach to the service account
+  imagePullSecrets: []
+  # Secrets to attach to the service account
+  secrets: []
 
 env: []
+envFrom: []  # Additional envFrom sources
 
 secret:
   enabled: false
   nameOverride: ""
-    # The secret data to be stored
-    # key1: value1
-    # key2: value2
+  type: Opaque  # Secret type (Opaque, kubernetes.io/tls, etc.)
+  immutable: false  # Make secret immutable
+  labels: {}
+  annotations: {}
+  # Data field - for MANUALLY base64 encoded values
+  # Use this if you have pre-encoded secrets or want full control
+  # Example:
+  #   data:
+  #     password: "bXktcGFzc3dvcmQ="  # Already base64 encoded
   data: {}
+  # String data - for RAW string values (RECOMMENDED)
+  # Kubernetes will automatically base64 encode these values
+  # Use this for easier secret management with raw values
+  # Example:
+  #   stringData:
+  #     username: "admin"
+  #     password: "my-password"
+  #     api_key: "abc123"
+  stringData: {}
 
 configMap:
   enabled: false
   nameOverride: ""
-  data:
-    # The config map data to be stored
+  immutable: false  # Make configmap immutable
+  labels: {}
+  annotations: {}
+  # The config map data to be stored
+  # Supports both string and complex data types
+  data: {}
     # key1: value1
     # key2: value2
+  # Binary data (base64 encoded values)
+  binaryData: {}
 
 podAnnotations: {}
 podLabels: {}
@@ -63,21 +118,54 @@ service:
   type: ClusterIP
   port: 80
   annotations: {}
+  labels: {}
   # Optionally set a specific nodePort (only for NodePort/LoadBalancer)
   # nodePort: 30080
+  # Advanced service configuration
+  clusterIP: ""  # Specific cluster IP or "None" for headless service
+  externalIPs: []  # List of external IPs
+  loadBalancerIP: ""  # Specific load balancer IP
+  loadBalancerSourceRanges: []  # Traffic source ranges for LoadBalancer
+  externalTrafficPolicy: ""  # Local or Cluster
+  sessionAffinity: ""  # ClientIP or None
+  sessionAffinityConfig: {}  # Session affinity configuration
+  healthCheckNodePort: 0  # Health check node port for LoadBalancer
+  ipFamilyPolicy: ""  # SingleStack, PreferDualStack, or RequireDualStack
+  ipFamilies: []  # IP families (IPv4, IPv6)
+  # Multiple ports configuration (overrides single port above)
+  ports: []
+  # - name: http
+  #   port: 80
+  #   targetPort: http
+  #   protocol: TCP
+  #   nodePort: 30080  # Optional
+  #   appProtocol: http  # Optional application protocol
 
 ingress:
   enabled: false
   className: traefik
+  labels: {}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
+  # Optional default backend
+  defaultBackend: {}
+    # service:
+    #   name: default-backend
+    #   port:
+    #     number: 80
   hosts:
     - host: chart-example.local
       paths:
         - path: /
           pathType: Prefix
+          # Optional: per-path backend override
+          backend: {}
+            # service:
+            #   name: custom-service
+            #   port:
+            #     number: 8080
   tls:
     - hosts:
         - chart-example.local
@@ -134,6 +222,31 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   targetMemoryUtilizationPercentage: 80
+  labels: {}
+  annotations: {}
+  # Custom metrics (overrides CPU/Memory targets if set)
+  metrics: []
+  # - type: Pods
+  #   pods:
+  #     metric:
+  #       name: custom_metric
+  #     target:
+  #       type: AverageValue
+  #       averageValue: "100"
+  # Scaling behavior (k8s 1.23+)
+  behavior: {}
+    # scaleDown:
+    #   stabilizationWindowSeconds: 300
+    #   policies:
+    #     - type: Percent
+    #       value: 10
+    #       periodSeconds: 60
+    # scaleUp:
+    #   stabilizationWindowSeconds: 0
+    #   policies:
+    #     - type: Percent
+    #       value: 100
+    #       periodSeconds: 15
 
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -165,11 +278,17 @@ strategy:
 podDisruptionBudget:
   enabled: false
   minAvailable: 1
-  # maxUnavailable: 1
+  # maxUnavailable: 1  # Cannot set both minAvailable and maxUnavailable
+  labels: {}
+  annotations: {}
+  # Unhealthy pod eviction policy (k8s 1.26+)
+  unhealthyPodEvictionPolicy: ""  # IfHealthyBudget or AlwaysAllow
 
 # Network Policy
 networkPolicy:
   enabled: false
+  labels: {}
+  annotations: {}
   policyTypes:
     - Ingress
     - Egress
@@ -200,3 +319,187 @@ sidecars: []
 # - name: sidecar
 #   image: busybox:1.28
 #   command: ['sh', '-c', 'tail -f /dev/null']
+
+# Extra containers (alternative to sidecars)
+extraContainers: []
+
+# Container ports configuration (overrides default http port)
+containerPorts: []
+# - name: http
+#   containerPort: 8080
+#   protocol: TCP
+# - name: metrics
+#   containerPort: 9090
+#   protocol: TCP
+
+# Shared defaults applied to all jobs and cronjobs unless overridden per job
+# These provide sensible defaults for common job configurations
+jobsDefaults:
+  annotations: {}
+  labels: {}
+  # Job spec defaults
+  completions:  # Number of successful completions (default: 1)
+  parallelism:  # Max pods running in parallel (default: 1)
+  backoffLimit: 6  # Number of retries before marking job as failed
+  ttlSecondsAfterFinished:  # Cleanup job after completion (e.g., 300 for 5 minutes)
+  activeDeadlineSeconds:  # Max time for job to complete before termination
+  completionMode:  # "NonIndexed" (default) or "Indexed" for indexed jobs
+  backoffLimitPerIndex:  # Per-index backoff limit for indexed jobs (k8s 1.25+)
+  maxFailedIndexes:  # Max failed indexes before job fails (k8s 1.25+)
+  podReplacementPolicy:  # "TerminatingOrFailed" or "Failed" (k8s 1.28+)
+  suspend: false  # Suspend job execution
+  # Pod spec defaults
+  restartPolicy: OnFailure  # "OnFailure" or "Never"
+  serviceAccountName: ""
+  priorityClassName: ""
+  runtimeClassName: ""
+  schedulerName: ""
+  shareProcessNamespace: false
+  dnsPolicy:
+  dnsConfig: {}
+  hostAliases: []
+  terminationGracePeriodSeconds:
+  topologySpreadConstraints: []
+  # Container defaults
+  image: {}  # Override with {repository, tag, pullPolicy}
+  podAnnotations: {}
+  podLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+  resources: {}
+  imagePullSecrets: []
+  initContainers: []
+  sidecars: []  # Sidecar containers for jobs
+  env: []
+  envFrom: []
+  volumeMounts: []
+  volumes: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  # CronJob specific defaults (only used when job has a schedule)
+  concurrencyPolicy: Allow  # "Allow", "Forbid", or "Replace"
+  startingDeadlineSeconds:  # Deadline for starting if job misses scheduled time
+  successfulJobsHistoryLimit: 3  # How many completed jobs to keep
+  failedJobsHistoryLimit: 1  # How many failed jobs to keep
+  timeZone:  # Timezone for schedule (e.g., "America/New_York", k8s 1.27+)
+
+# Jobs and CronJobs - supports both one-time jobs and scheduled tasks
+# Jobs can also be Helm hooks for lifecycle management (migrations, setup, etc.)
+jobs: []
+# Example 1: Database migration as a Helm hook (runs on install/upgrade)
+# - name: db-migrate
+#   enabled: true
+#   # Helm hook configuration - runs before install/upgrade
+#   hooks:
+#     - pre-install
+#     - pre-upgrade
+#   hookWeight: "-5"  # Run before other pre-install/upgrade hooks
+#   hookDeletePolicy:
+#     - before-hook-creation  # Delete old job before creating new one
+#   # Job configuration
+#   completions: 1
+#   backoffLimit: 3
+#   ttlSecondsAfterFinished: 300  # Clean up after 5 minutes
+#   activeDeadlineSeconds: 600  # Timeout after 10 minutes
+#   restartPolicy: OnFailure
+#   command: ["bundle", "exec", "rake", "db:migrate"]
+#   image:
+#     repository: myapp/backend
+#     tag: "1.2.3"
+#     pullPolicy: IfNotPresent
+#   resources:
+#     requests:
+#       cpu: 100m
+#       memory: 256Mi
+#     limits:
+#       cpu: 500m
+#       memory: 512Mi
+
+# Example 2: CronJob for scheduled cleanup task
+# - name: cleanup
+#   enabled: true
+#   # CronJob schedule (daily at 2 AM)
+#   schedule: "0 2 * * *"
+#   timeZone: "UTC"  # Optional: specify timezone
+#   concurrencyPolicy: Forbid  # Don't allow concurrent runs
+#   successfulJobsHistoryLimit: 3
+#   failedJobsHistoryLimit: 1
+#   # Job spec
+#   completions: 1
+#   backoffLimit: 2
+#   ttlSecondsAfterFinished: 86400  # Clean up after 24 hours
+#   command: ["python", "cleanup.py"]
+#   args: ["--days", "30"]
+#   resources:
+#     requests:
+#       cpu: 50m
+#       memory: 128Mi
+
+# Example 3: Indexed job for parallel batch processing (k8s 1.24+)
+# - name: batch-process
+#   enabled: true
+#   completionMode: Indexed
+#   completions: 10  # Process 10 items
+#   parallelism: 3  # Process 3 at a time
+#   backoffLimitPerIndex: 2  # Allow 2 retries per index
+#   maxFailedIndexes: 2  # Fail if more than 2 indexes fail
+#   command: ["python", "process.py"]
+#   args: ["--index", "$(JOB_COMPLETION_INDEX)"]
+#   env:
+#     - name: JOB_COMPLETION_INDEX
+#       valueFrom:
+#         fieldRef:
+#           fieldPath: metadata.annotations['batch.kubernetes.io/job-completion-index']
+
+# Example 4: Job with pod failure policy (k8s 1.25+)
+# - name: critical-task
+#   enabled: true
+#   backoffLimit: 6
+#   # Advanced failure handling
+#   podFailurePolicy:
+#     rules:
+#       # Ignore errors from specific exit codes
+#       - action: Ignore
+#         onExitCodes:
+#           containerName: job
+#           operator: In
+#           values: [42, 43]  # Skip these exit codes
+#       # Fail fast on OOM errors
+#       - action: FailJob
+#         onPodConditions:
+#           - type: DisruptionTarget
+#   command: ["./critical-task.sh"]
+
+# Example 5: Post-install hook with success policy (k8s 1.30+)
+# - name: init-data
+#   enabled: true
+#   hooks:
+#     - post-install
+#   hookDeletePolicy:
+#     - hook-succeeded
+#   completions: 3
+#   parallelism: 3
+#   # Succeed when 2 out of 3 pods succeed
+#   successPolicy:
+#     rules:
+#       - succeededIndexes: "0,1"
+#         succeededCount: 2
+#   command: ["./init.sh"]
+
+# Example 6: Simple one-time job with sidecars
+# - name: backup
+#   enabled: true
+#   command: ["pg_dump", "-h", "postgres", "-U", "user", "dbname"]
+#   sidecars:
+#     - name: log-shipper
+#       image: fluent/fluent-bit:latest
+#       volumeMounts:
+#         - name: logs
+#           mountPath: /logs
+#   volumes:
+#     - name: logs
+#       emptyDir: {}
+#   volumeMounts:
+#     - name: logs
+#       mountPath: /var/log
