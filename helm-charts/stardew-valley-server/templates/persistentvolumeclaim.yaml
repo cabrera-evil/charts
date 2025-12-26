@@ -1,0 +1,49 @@
+{{- if .Values.persistence.gameData.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "stardew-valley-server.fullname" . }}-game-data
+  labels:
+    {{- include "stardew-valley-server.labels" . | nindent 4 }}
+    app.kubernetes.io/component: storage
+  {{- with .Values.persistence.gameData.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.gameData.accessMode }}
+  {{- with .Values.persistence.gameData.storageClass }}
+  {{- if ne . "" }}
+  storageClassName: {{ . }}
+  {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.gameData.size }}
+{{- end }}
+---
+{{- if .Values.persistence.serverConfig.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "stardew-valley-server.fullname" . }}-server-config
+  labels:
+    {{- include "stardew-valley-server.labels" . | nindent 4 }}
+    app.kubernetes.io/component: storage
+  {{- with .Values.persistence.serverConfig.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    - {{ .Values.persistence.serverConfig.accessMode }}
+  {{- with .Values.persistence.serverConfig.storageClass }}
+  {{- if ne . "" }}
+  storageClassName: {{ . }}
+  {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.serverConfig.size }}
+{{- end }}
