@@ -3,7 +3,7 @@ name: stardew-valley-server
 description: Helm chart for deploying Stardew Valley dedicated game server
 kubeVersion: ">=1.19.0-0"
 home: https://github.com/cabrera-evil/charts
-icon: https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.svg
+icon: https://raw.githubusercontent.com/cabrera-evil/charts/master/assets/stardew-valley-server.png
 sources:
   - https://github.com/cabrera-evil/charts/tree/master/helm-charts/stardew-valley-server
   - https://github.com/Sdv-Dev/sdvd
