@@ -1,0 +1,92 @@
+***********************************************************************
+ Stardew Valley Dedicated Server
+ Release: {{ .Release.Name }}
+ Namespace: {{ .Release.Namespace }}
+***********************************************************************
+
+Your Stardew Valley server has been deployed!
+
+GAME SERVER INFORMATION:
+- Server Version: {{ .Chart.AppVersion }}
+- Game Port: {{ .Values.service.gamePort }}/{{ .Values.service.protocol }}
+- Steam User: {{ .Values.gameServer.steamCredentials.username }}
+
+CONNECTION DETAILS:
+
+{{- if eq .Values.service.type "LoadBalancer" }}
+1. Wait for LoadBalancer IP to be assigned:
+
+   kubectl get svc {{ include "stardew-valley-server.fullname" . }} -n {{ .Release.Namespace }} --watch
+
+2. Once EXTERNAL-IP is assigned, connect using:
+
+   Server IP: <EXTERNAL-IP>
+   Port: {{ .Values.service.gamePort }}
+
+3. Get the IP with:
+
+   export SERVER_IP=$(kubectl get svc {{ include "stardew-valley-server.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+   echo "Connect to: $SERVER_IP:{{ .Values.service.gamePort }}"
+
+{{- else if eq .Values.service.type "NodePort" }}
+1. Get your node's external IP:
+
+   export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}')
+   export NODE_PORT=$(kubectl get svc {{ include "stardew-valley-server.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}')
+
+   echo "Connect to: $NODE_IP:$NODE_PORT"
+
+{{- else }}
+1. This service is ClusterIP - not externally accessible.
+   To expose it, upgrade with service.type=LoadBalancer or service.type=NodePort
+
+{{- end }}
+
+MANAGEMENT COMMANDS:
+
+- Check server status:
+  kubectl get deployment {{ include "stardew-valley-server.fullname" . }} -n {{ .Release.Namespace }}
+
+- View server logs:
+  kubectl logs -f deployment/{{ include "stardew-valley-server.fullname" . }} -n {{ .Release.Namespace }}
+
+- Check persistent volumes:
+  kubectl get pvc -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+- Restart server (force update):
+  kubectl rollout restart deployment/{{ include "stardew-valley-server.fullname" . }} -n {{ .Release.Namespace }}
+
+- Access server console (if pod is running):
+  kubectl exec -it deployment/{{ include "stardew-valley-server.fullname" . }} -n {{ .Release.Namespace }} -- /bin/bash
+
+BACKUP INSTRUCTIONS:
+
+Your game data is stored in PersistentVolumeClaims:
+- Game saves: {{ include "stardew-valley-server.fullname" . }}-game-data
+- Server config: {{ include "stardew-valley-server.fullname" . }}-server-config
+
+To backup your saves:
+  kubectl cp {{ .Release.Namespace }}/$(kubectl get pod -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "stardew-valley-server.name" . }} -o jsonpath='{.items[0].metadata.name}'):/data/Stardew ./stardew-backup
+
+{{- if .Values.gameServer.vncPassword }}
+
+VNC ACCESS:
+
+VNC is enabled. To access the server GUI:
+  kubectl port-forward deployment/{{ include "stardew-valley-server.fullname" . }} -n {{ .Release.Namespace }} 5900:5900
+
+Then connect with VNC client to: localhost:5900
+Password: [configured in values]
+{{- end }}
+
+TROUBLESHOOTING:
+
+If the server is not starting:
+1. Check logs for Steam authentication errors
+2. Verify Steam Guard code is current (expires after ~30 seconds)
+3. Ensure your Steam account owns Stardew Valley
+4. Check resource availability: kubectl describe pod -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "stardew-valley-server.name" . }}
+
+For more information:
+- Chart documentation: https://github.com/cabrera-evil/charts
+- SDVD project: https://github.com/Sdv-Dev/sdvd

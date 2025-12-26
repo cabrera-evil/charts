@@ -1,0 +1,181 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["image"],
+  "properties": {
+    "replicaCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1,
+      "description": "Must be 1 for game servers (they don't horizontally scale)"
+    },
+    "image": {
+      "type": "object",
+      "required": ["repository"],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Container image repository"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "description": "Image pull policy"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Image tag (defaults to chart appVersion)"
+        }
+      }
+    },
+    "gameServer": {
+      "type": "object",
+      "required": ["steamCredentials"],
+      "properties": {
+        "gamePort": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 65535,
+          "description": "Game server port number"
+        },
+        "steamCredentials": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string",
+              "description": "Steam account username (required at install time)"
+            },
+            "password": {
+              "type": "string",
+              "description": "Steam account password (required at install time)"
+            },
+            "guardCode": {
+              "type": "string",
+              "description": "Steam Guard 2FA code (if enabled)"
+            }
+          }
+        },
+        "vncPassword": {
+          "type": "string",
+          "description": "VNC password for server management"
+        },
+        "disableRendering": {
+          "type": "string",
+          "enum": ["true", "false"],
+          "description": "Disable graphics rendering for headless operation"
+        }
+      }
+    },
+    "persistence": {
+      "type": "object",
+      "properties": {
+        "gameData": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable persistent volume for game data"
+            },
+            "size": {
+              "type": "string",
+              "pattern": "^[0-9]+(Gi|Mi|Ti)$",
+              "description": "Size of game data volume (e.g., 10Gi)"
+            },
+            "storageClass": {
+              "type": "string",
+              "description": "Storage class name (empty uses default)"
+            },
+            "accessMode": {
+              "type": "string",
+              "enum": ["ReadWriteOnce", "ReadWriteMany", "ReadOnlyMany"],
+              "description": "Volume access mode"
+            }
+          }
+        },
+        "serverConfig": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable persistent volume for server config"
+            },
+            "size": {
+              "type": "string",
+              "pattern": "^[0-9]+(Gi|Mi|Ti)$",
+              "description": "Size of config volume (e.g., 1Gi)"
+            },
+            "storageClass": {
+              "type": "string",
+              "description": "Storage class name (empty uses default)"
+            },
+            "accessMode": {
+              "type": "string",
+              "enum": ["ReadWriteOnce", "ReadWriteMany", "ReadOnlyMany"],
+              "description": "Volume access mode"
+            }
+          }
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "required": ["type", "gamePort", "protocol"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer"],
+          "description": "Kubernetes service type"
+        },
+        "gamePort": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Service port number"
+        },
+        "protocol": {
+          "type": "string",
+          "enum": ["UDP", "TCP"],
+          "description": "Service protocol"
+        },
+        "nodePort": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 30000,
+              "maximum": 32767
+            },
+            {
+              "type": "string",
+              "maxLength": 0
+            }
+          ],
+          "description": "NodePort (30000-32767) for NodePort/LoadBalancer types"
+        },
+        "externalTrafficPolicy": {
+          "type": "string",
+          "enum": ["Cluster", "Local"],
+          "description": "External traffic policy"
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "description": "Resource requests and limits"
+    },
+    "serviceAccount": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "type": "boolean"
+        },
+        "automount": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
