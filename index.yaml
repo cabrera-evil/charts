@@ -3,9 +3,9 @@ entries:
   deploy-chart:
   - apiVersion: v2
     appVersion: latest
-    created: "2025-12-03T03:09:38.772758581Z"
+    created: "2026-05-03T13:56:42.151233513-06:00"
     description: Generic Helm chart for app deployment
-    digest: b7441c18139802c780c4179824da2c047b0e0cbeb0a029e93fafbfc9c50d2ced
+    digest: 329bf44a73e830c4c68f0e6a6512eebab7330a57c72d970a2bad874152d79c4e
     home: https://github.com/cabrera-evil/charts
     icon: https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.svg
     keywords:
@@ -24,13 +24,13 @@ entries:
     - https://github.com/cabrera-evil/charts/tree/master/helm-charts/deploy-chart
     type: application
     urls:
-    - https://github.com/cabrera-evil/charts/releases/download/deploy-chart-0.3.0/deploy-chart-0.3.0.tgz
+    - https://cabrera-evil.github.io/charts/charts/deploy-chart-0.3.0.tgz
     version: 0.3.0
   - apiVersion: v2
     appVersion: latest
-    created: "2025-11-23T23:24:23.344705748Z"
+    created: "2026-05-03T13:56:42.149880356-06:00"
     description: Generic Helm chart for app deployment
-    digest: 93eac920e11ccd896cb1ea8d9727ccc141d8ae4f75febe97cf09fe121d6625f3
+    digest: 749f8116edcf66befa972275758a8a24d72b46914953427edbd8fc9b6394e575
     home: https://github.com/cabrera-evil/charts
     icon: https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.svg
     keywords:
@@ -49,11 +49,11 @@ entries:
     - https://github.com/cabrera-evil/charts/tree/master/helm-charts/deploy-chart
     type: application
     urls:
-    - https://github.com/cabrera-evil/charts/releases/download/deploy-chart-0.2.0/deploy-chart-0.2.0.tgz
+    - https://cabrera-evil.github.io/charts/charts/deploy-chart-0.2.0.tgz
     version: 0.2.0
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2025-09-10T11:46:53.525565681-06:00"
+    created: "2026-05-03T13:56:42.149366932-06:00"
     description: Generic Helm chart for app deployment
     digest: 588b45b613dec0fa87d173b061b25ecbf2ba89c196dca82de5aac9305edf6d55
     name: deploy-chart
@@ -63,7 +63,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2025-09-10T11:46:53.525212476-06:00"
+    created: "2026-05-03T13:56:42.148954891-06:00"
     description: Generic Helm chart for app deployment
     digest: ae809d468c7bcca859745092dbadb8ea1b44c90f78762fe12393a69581ee3e89
     name: deploy-chart
@@ -74,9 +74,9 @@ entries:
   openclaw:
   - apiVersion: v2
     appVersion: latest
-    created: "2026-05-03T19:58:27.252649709Z"
+    created: "2026-05-03T13:56:42.152650442-06:00"
     description: Helm chart for deploying OpenClaw AI gateway on Kubernetes
-    digest: 432f466a9a64fd804b2c308d595672f8181d716e21f0f3a9c1cdd19001606311
+    digest: 6df8155a7e720e16097508b980a671d44c743f782b2924dc8b2d8445b8a0a05f
     home: https://github.com/cabrera-evil/charts
     icon: https://raw.githubusercontent.com/cabrera-evil/charts/master/assets/openclaw.png
     keywords:
@@ -96,14 +96,40 @@ entries:
     - https://github.com/openclaw/openclaw
     type: application
     urls:
-    - https://github.com/cabrera-evil/charts/releases/download/openclaw-0.1.1/openclaw-0.1.1.tgz
+    - https://cabrera-evil.github.io/charts/charts/openclaw-0.1.1.tgz
     version: 0.1.1
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-05-03T13:56:42.151957213-06:00"
+    description: Helm chart for deploying OpenClaw AI gateway on Kubernetes
+    digest: 91fb2362b55f8464377f91a31a0c4b3ef2cc6e4ce5f5b5815ba9b754159d5efc
+    home: https://github.com/cabrera-evil/charts
+    icon: https://raw.githubusercontent.com/cabrera-evil/charts/master/assets/openclaw.png
+    keywords:
+    - openclaw
+    - ai
+    - gateway
+    - agent
+    - llm
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: contact@cabrera-dev.com
+      name: Douglas Cabrera
+      url: https://cabrera-dev.com
+    name: openclaw
+    sources:
+    - https://github.com/cabrera-evil/charts/tree/master/helm-charts/openclaw
+    - https://github.com/openclaw/openclaw
+    type: application
+    urls:
+    - https://cabrera-evil.github.io/charts/charts/openclaw-0.1.0.tgz
+    version: 0.1.0
   stardew-valley-server:
   - apiVersion: v2
     appVersion: latest
-    created: "2026-05-03T19:58:27.376636734Z"
+    created: "2026-05-03T13:56:42.153244808-06:00"
     description: Helm chart for deploying Stardew Valley dedicated game server
-    digest: b975f60b01a3050558d16f410baecc8518e844fc664bfdfa194c7cafebabdb23
+    digest: 35cb228b42181602b0c6734ce71def8849384a9da605c969ba49e5824a86c68b
     home: https://github.com/cabrera-evil/charts
     icon: https://raw.githubusercontent.com/cabrera-evil/charts/master/assets/stardew-valley-server.png
     keywords:
@@ -123,6 +149,6 @@ entries:
     - https://github.com/Sdv-Dev/sdvd
     type: application
     urls:
-    - https://github.com/cabrera-evil/charts/releases/download/stardew-valley-server-0.1.0/stardew-valley-server-0.1.0.tgz
+    - https://cabrera-evil.github.io/charts/charts/stardew-valley-server-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-03T19:58:27.376650865Z"
+generated: "2026-05-03T13:56:42.148422636-06:00"

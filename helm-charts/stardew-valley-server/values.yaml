@@ -1,0 +1,191 @@
+# Default values for stardew-valley-server.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Number of replicas (game servers typically run as single instance)
+replicaCount: 1
+
+image:
+  repository: sdvd/server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Game Server Configuration
+gameServer:
+  # Game server port (UDP)
+  gamePort: 24642
+
+  # Steam credentials (REQUIRED)
+  # These are used to authenticate with Steam and download Stardew Valley
+  steamCredentials:
+    username: ""
+    password: ""
+    guardCode: ""  # Steam Guard 2FA code (if enabled)
+
+  # VNC password for remote access to server GUI
+  vncPassword: ""
+
+  # Disable rendering for headless operation (recommended for servers)
+  disableRendering: "true"
+
+# Persistent storage configuration
+persistence:
+  # Game data volume (save files, mods, etc.)
+  gameData:
+    enabled: true
+    # Storage class name (leave empty to use cluster default)
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    annotations: {}
+
+  # Server configuration volume
+  serverConfig:
+    enabled: true
+    storageClass: ""
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    annotations: {}
+
+# Service configuration
+service:
+  type: LoadBalancer
+  # Game server port
+  gamePort: 24642
+  protocol: UDP
+  annotations: {}
+  # Optional: specify a node port (30000-32767) for NodePort or LoadBalancer service types
+  nodePort: ""
+  # Preserve client source IP (important for player management/banning)
+  externalTrafficPolicy: Local
+
+# Resource limits and requests
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "1000m"
+  limits:
+    memory: "4Gi"
+    cpu: "2000m"
+
+# Service Account
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod labels
+podLabels: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+
+# Container security context
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  # Game server needs to write to filesystem
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+
+# Liveness probe configuration
+# Checks if the game server process is running
+livenessProbe:
+  enabled: true
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - pgrep -f "StardewValley" || exit 1
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Readiness probe configuration
+# Checks if the game server is ready to accept connections
+readinessProbe:
+  enabled: true
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - pgrep -f "StardewValley" || exit 1
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Startup probe configuration
+# Gives the server time to start up before health checks begin
+startupProbe:
+  enabled: true
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - pgrep -f "StardewValley" || exit 1
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 30  # 5 minutes total startup time
+
+# Lifecycle hooks
+lifecycle:
+  # Give the server time to save and shutdown gracefully
+  preStop:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - sleep 15
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# Graceful termination period
+terminationGracePeriodSeconds: 30
+
+# Number of old ReplicaSets to retain
+revisionHistoryLimit: 3
+
+# Autoscaling (disabled for game servers)
+autoscaling:
+  enabled: false
+
+# Ingress (disabled for UDP game servers)
+ingress:
+  enabled: false
+
+# Pod Disruption Budget (disabled for single replica)
+podDisruptionBudget:
+  enabled: false
+
+# Network Policy (disabled by default)
+networkPolicy:
+  enabled: false

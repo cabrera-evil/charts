@@ -1,0 +1,51 @@
+OpenClaw has been deployed successfully.
+
+{{- if eq .Values.gateway.bind "loopback" }}
+
+  Access the gateway via port-forward (loopback bind):
+
+    kubectl port-forward svc/{{ include "openclaw.fullname" . }} {{ .Values.gateway.port }}:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+    open http://localhost:{{ .Values.gateway.port }}
+
+{{- else if .Values.ingress.enabled }}
+
+  Access the gateway via Ingress:
+  {{- range .Values.ingress.hosts }}
+  {{- range .paths }}
+    http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host | default "your-host" }}{{ .path }}
+  {{- end }}
+  {{- end }}
+
+{{- else }}
+
+  Access the gateway via the Service ({{ .Values.service.type }}):
+    kubectl get svc {{ include "openclaw.fullname" . }} -n {{ .Release.Namespace }}
+
+{{- end }}
+
+{{- if .Values.secret.enabled }}
+
+  Retrieve the gateway token for the Control UI:
+
+    kubectl get secret {{ include "openclaw.fullname" . }}-secret \
+      -n {{ .Release.Namespace }} \
+      -o jsonpath='{.data.OPENCLAW_GATEWAY_TOKEN}' | base64 -d
+
+{{- end }}
+
+{{- if and .Values.secret.enabled (not .Values.secret.anthropicApiKey) (not .Values.secret.geminiApiKey) (not .Values.secret.openaiApiKey) (not .Values.secret.openrouterApiKey) }}
+
+  WARNING: No model provider API key is configured.
+  Set at least one of the following in your values:
+    secret.anthropicApiKey
+    secret.geminiApiKey
+    secret.openaiApiKey
+    secret.openrouterApiKey
+
+  Or patch the Secret directly:
+    kubectl patch secret {{ include "openclaw.fullname" . }}-secret \
+      -n {{ .Release.Namespace }} \
+      -p '{"stringData":{"ANTHROPIC_API_KEY":"sk-..."}}'
+    kubectl rollout restart deployment/{{ include "openclaw.fullname" . }} -n {{ .Release.Namespace }}
+
+{{- end }}
