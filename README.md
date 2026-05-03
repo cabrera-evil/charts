@@ -53,6 +53,7 @@ helm install <release-name> cabrera-evil/<chart-name> [flags]
 | Chart Name                                                       | Description                                                                                                         | Version | App Version | Kubernetes |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------- | ----------- | ---------- |
 | **[deploy-chart](./helm-charts/deploy-chart)**                   | Production-ready generic Helm chart for deploying containerized applications with comprehensive Kubernetes features | 0.3.0   | latest      | >=1.19.0   |
+| **[openclaw](./helm-charts/openclaw)**                           | AI gateway and agent platform with persistent state, multi-provider API key management, and optional Ingress/HA     | 0.1.0   | latest      | >=1.19.0   |
 | **[stardew-valley-server](./helm-charts/stardew-valley-server)** | Dedicated game server for Stardew Valley multiplayer with persistent storage and VNC support                        | 0.1.0   | latest      | >=1.19.0   |
 
 > Each chart includes a dedicated `README.md` with comprehensive usage instructions, configuration examples, and complete parameter reference.
