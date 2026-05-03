@@ -71,4 +71,58 @@ entries:
     urls:
     - https://cabrera-evil.github.io/charts/charts/deploy-chart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-03T03:09:38.77277406Z"
+  openclaw:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-05-03T19:58:27.252649709Z"
+    description: Helm chart for deploying OpenClaw AI gateway on Kubernetes
+    digest: 432f466a9a64fd804b2c308d595672f8181d716e21f0f3a9c1cdd19001606311
+    home: https://github.com/cabrera-evil/charts
+    icon: https://raw.githubusercontent.com/cabrera-evil/charts/master/assets/openclaw.png
+    keywords:
+    - openclaw
+    - ai
+    - gateway
+    - agent
+    - llm
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: contact@cabrera-dev.com
+      name: Douglas Cabrera
+      url: https://cabrera-dev.com
+    name: openclaw
+    sources:
+    - https://github.com/cabrera-evil/charts/tree/master/helm-charts/openclaw
+    - https://github.com/openclaw/openclaw
+    type: application
+    urls:
+    - https://github.com/cabrera-evil/charts/releases/download/openclaw-0.1.1/openclaw-0.1.1.tgz
+    version: 0.1.1
+  stardew-valley-server:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-05-03T19:58:27.376636734Z"
+    description: Helm chart for deploying Stardew Valley dedicated game server
+    digest: b975f60b01a3050558d16f410baecc8518e844fc664bfdfa194c7cafebabdb23
+    home: https://github.com/cabrera-evil/charts
+    icon: https://raw.githubusercontent.com/cabrera-evil/charts/master/assets/stardew-valley-server.png
+    keywords:
+    - stardew-valley
+    - game-server
+    - gaming
+    - multiplayer
+    - steam
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: contact@cabrera-dev.com
+      name: Douglas Cabrera
+      url: https://cabrera-dev.com
+    name: stardew-valley-server
+    sources:
+    - https://github.com/cabrera-evil/charts/tree/master/helm-charts/stardew-valley-server
+    - https://github.com/Sdv-Dev/sdvd
+    type: application
+    urls:
+    - https://github.com/cabrera-evil/charts/releases/download/stardew-valley-server-0.1.0/stardew-valley-server-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-05-03T19:58:27.376650865Z"
