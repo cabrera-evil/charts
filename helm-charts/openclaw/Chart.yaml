@@ -1,0 +1,25 @@
+apiVersion: v2
+name: openclaw
+description: Helm chart for deploying OpenClaw AI gateway on Kubernetes
+kubeVersion: ">=1.19.0-0"
+home: https://github.com/cabrera-evil/charts
+icon: https://raw.githubusercontent.com/cabrera-evil/charts/master/assets/openclaw.png
+sources:
+  - https://github.com/cabrera-evil/charts/tree/master/helm-charts/openclaw
+  - https://github.com/openclaw/openclaw
+keywords:
+  - openclaw
+  - ai
+  - gateway
+  - agent
+  - llm
+maintainers:
+  - name: Douglas Cabrera
+    email: contact@cabrera-dev.com
+    url: https://cabrera-dev.com
+
+type: application
+
+version: 0.1.0
+
+appVersion: "latest"
