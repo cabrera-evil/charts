@@ -57,14 +57,61 @@ extraGatewayConfig: {}
 # All fields are optional — only non-empty values are written into the Secret
 secret:
   enabled: true
-  # Gateway authentication token (used by the Control UI)
-  # Leave empty to disable token auth (not recommended in production)
+
+  # --- Gateway auth ---
+  # Control UI authentication token (strongly recommended)
   gatewayToken: ""
-  # Model provider API keys — set the ones you use
-  anthropicApiKey: ""
-  geminiApiKey: ""
-  openaiApiKey: ""
-  openrouterApiKey: ""
+  # Alternative: password-based auth (use token OR password, not both)
+  gatewayPassword: ""
+
+  # --- Model providers (core) ---
+  anthropicApiKey: ""       # ANTHROPIC_API_KEY
+  geminiApiKey: ""          # GEMINI_API_KEY
+  openaiApiKey: ""          # OPENAI_API_KEY
+  openrouterApiKey: ""      # OPENROUTER_API_KEY
+  googleApiKey: ""          # GOOGLE_API_KEY
+
+  # --- Model provider live keys (bypass caching/pooling) ---
+  openaiLiveKey: ""         # OPENCLAW_LIVE_OPENAI_KEY
+  anthropicLiveKey: ""      # OPENCLAW_LIVE_ANTHROPIC_KEY
+  geminiLiveKey: ""         # OPENCLAW_LIVE_GEMINI_KEY
+
+  # --- Numbered / pooled key variants ---
+  openaiApiKey1: ""         # OPENAI_API_KEY_1
+  anthropicApiKey1: ""      # ANTHROPIC_API_KEY_1
+  geminiApiKey1: ""         # GEMINI_API_KEY_1
+  openaiApiKeys: ""         # OPENAI_API_KEYS  (comma-separated pool)
+  anthropicApiKeys: ""      # ANTHROPIC_API_KEYS
+  geminiApiKeys: ""         # GEMINI_API_KEYS
+
+  # --- Additional / specialty providers ---
+  zaiApiKey: ""             # ZAI_API_KEY
+  aiGatewayApiKey: ""       # AI_GATEWAY_API_KEY
+  tokenhubApiKey: ""        # TOKENHUB_API_KEY
+  lkeapApiKey: ""           # LKEAP_API_KEY
+  minimaxApiKey: ""         # MINIMAX_API_KEY
+  syntheticApiKey: ""       # SYNTHETIC_API_KEY
+
+  # --- Channels ---
+  telegramBotToken: ""      # TELEGRAM_BOT_TOKEN
+  discordBotToken: ""       # DISCORD_BOT_TOKEN
+  slackBotToken: ""         # SLACK_BOT_TOKEN
+  slackAppToken: ""         # SLACK_APP_TOKEN
+  mattermostBotToken: ""    # MATTERMOST_BOT_TOKEN
+  mattermostUrl: ""         # MATTERMOST_URL
+  zaloBotToken: ""          # ZALO_BOT_TOKEN
+  twitchAccessToken: ""     # OPENCLAW_TWITCH_ACCESS_TOKEN
+
+  # --- Tools / search ---
+  braveApiKey: ""           # BRAVE_API_KEY
+  perplexityApiKey: ""      # PERPLEXITY_API_KEY
+  firecrawlApiKey: ""       # FIRECRAWL_API_KEY
+
+  # --- Voice / media ---
+  elevenlabsApiKey: ""      # ELEVENLABS_API_KEY
+  xiApiKey: ""              # XI_API_KEY (ElevenLabs alias)
+  inworldApiKey: ""         # INWORLD_API_KEY
+  deepgramApiKey: ""        # DEEPGRAM_API_KEY
 
 # Persistent storage for agent state, conversation memory, and config overrides
 persistence:
