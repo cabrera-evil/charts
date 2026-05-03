@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "openclaw.fullname" . }}-config
+  labels:
+    {{- include "openclaw.labels" . | nindent 4 }}
+data:
+  openclaw.json: |
+    {{- merge (dict "gateway" (dict "bind" .Values.gateway.bind "port" .Values.gateway.port "tokenAuth" .Values.gateway.tokenAuth)) .Values.extraGatewayConfig | toJson | nindent 4 }}
+  AGENTS.md: |
+    {{- .Values.agentsConfig | nindent 4 }}
