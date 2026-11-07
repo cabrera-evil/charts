@@ -61,43 +61,7 @@ entries:
     urls:
     - https://cabrera-evil.github.io/charts/charts/deploy-chart-0.1.1.tgz
     version: 0.1.1
-  - apiVersion: v2
-    appVersion: 0.0.1
-    created: "2026-05-03T13:56:42.148954891-06:00"
-    description: Generic Helm chart for app deployment
-    digest: ae809d468c7bcca859745092dbadb8ea1b44c90f78762fe12393a69581ee3e89
-    name: deploy-chart
-    type: application
-    urls:
-    - https://cabrera-evil.github.io/charts/charts/deploy-chart-0.1.0.tgz
-    version: 0.1.0
   openclaw:
-  - apiVersion: v2
-    appVersion: latest
-    created: "2026-05-03T13:56:42.152650442-06:00"
-    description: Helm chart for deploying OpenClaw AI gateway on Kubernetes
-    digest: 6df8155a7e720e16097508b980a671d44c743f782b2924dc8b2d8445b8a0a05f
-    home: https://github.com/cabrera-evil/charts
-    icon: https://raw.githubusercontent.com/cabrera-evil/charts/master/assets/openclaw.png
-    keywords:
-    - openclaw
-    - ai
-    - gateway
-    - agent
-    - llm
-    kubeVersion: '>=1.19.0-0'
-    maintainers:
-    - email: contact@cabrera-dev.com
-      name: Douglas Cabrera
-      url: https://cabrera-dev.com
-    name: openclaw
-    sources:
-    - https://github.com/cabrera-evil/charts/tree/master/helm-charts/openclaw
-    - https://github.com/openclaw/openclaw
-    type: application
-    urls:
-    - https://cabrera-evil.github.io/charts/charts/openclaw-0.1.1.tgz
-    version: 0.1.1
   - apiVersion: v2
     appVersion: latest
     created: "2026-05-03T13:56:42.151957213-06:00"
